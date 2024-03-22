@@ -3,7 +3,6 @@ package chat
 import (
 	"context"
 	"errors"
-	"time"
 
 	"github.com/gocql/gocql"
 	"golang.org/x/sync/errgroup"
@@ -11,20 +10,29 @@ import (
 	"openmyth/messgener/internal/chat/entity"
 	"openmyth/messgener/internal/chat/repository"
 	"openmyth/messgener/pkg/websocket"
+	"openmyth/messgener/util/snowflake"
 )
 
+// ChatImpl represents the implementation of the chat service.
 type ChatImpl struct {
 	onlineRepo  repository.OnlineRepository
 	messageRepo repository.MessageRepository
+
+	idGenerator *snowflake.Generator
 }
 
 // NewChatImpl creates a new instance of the ChatImpl struct, which implements the websocket.Impl interface for the Message type.
 //
 // It returns a pointer to the ChatImpl struct.
-func NewChatImpl(onlineRepo repository.OnlineRepository, messageRepo repository.MessageRepository) websocket.Impl[Message] {
+func NewChatImpl(
+	onlineRepo repository.OnlineRepository,
+	messageRepo repository.MessageRepository,
+	idGenerator *snowflake.Generator,
+) websocket.Impl[Message] {
 	return &ChatImpl{
 		onlineRepo:  onlineRepo,
 		messageRepo: messageRepo,
+		idGenerator: idGenerator,
 	}
 }
 
@@ -42,28 +50,28 @@ func (i *ChatImpl) Execute(client *websocket.Client[Message], data Message) erro
 	}
 
 	eg, _ := errgroup.WithContext(ctx)
-	now := time.Now().Unix()
+	id := i.idGenerator.Generate().Int64()
+
 	eg.Go(func() error {
 		return i.messageRepo.Create(ctx, &entity.Message{
-			Bucket:    0,
+			Bucket:    snowflake.MakeBucket(id),
 			UserID:    client.UserID,
 			FromID:    client.UserID,
 			ToID:      toUserID,
+			MessageID: id,
 			Content:   data.Content,
 			Reaction:  []string{},
-			CreatedAt: now,
 		})
 	})
 
 	eg.Go(func() error {
 		return i.messageRepo.Create(ctx, &entity.Message{
-			Bucket:    0,
-			UserID:    toUserID,
-			FromID:    client.UserID,
-			ToID:      toUserID,
-			Content:   data.Content,
-			Reaction:  []string{},
-			CreatedAt: now,
+			Bucket:   snowflake.MakeBucket(id),
+			UserID:   toUserID,
+			FromID:   client.UserID,
+			ToID:     toUserID,
+			Content:  data.Content,
+			Reaction: []string{},
 		})
 	})
 

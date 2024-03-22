@@ -3,6 +3,7 @@ module openmyth/messgener
 go 1.22.1
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/gocql/gocql v0.0.0-20211015133455-b225f9b53fa1
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1

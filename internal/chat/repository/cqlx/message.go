@@ -47,7 +47,7 @@ func (r *messageRepository) Create(ctx context.Context, data *entity.Message) er
 }
 
 // RetrieveByUserID retrieves a list of messages for a given user ID, starting from the specified offset and limited to the specified limit.
-func (r *messageRepository) RetrieveByUserID(ctx context.Context, userID string, offset, limit int64) ([]*entity.Message, error) {
+func (r *messageRepository) RetrieveMessages(ctx context.Context, userID, toID string, offset, limit int64) ([]*entity.Message, error) {
 	var result []*entity.Message
 	if err := messageTable.SelectBuilder().Where(
 		qb.Eq("user_id"),
@@ -55,9 +55,9 @@ func (r *messageRepository) RetrieveByUserID(ctx context.Context, userID string,
 		qb.Gt("created_at"),
 	).Limit(uint(limit)).QueryContext(ctx, r.db.Session).
 		BindStruct(&entity.Message{
-			Bucket:    offset,
-			UserID:    userID,
-			CreatedAt: offset,
+			Bucket: offset,
+			UserID: userID,
+			ToID:   toID,
 		}).SelectRelease(&result); err != nil {
 		return nil, err
 	}
