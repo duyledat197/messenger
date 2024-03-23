@@ -1,6 +1,8 @@
 package snowflake
 
 import (
+	"time"
+
 	"github.com/bwmarrin/snowflake"
 )
 
@@ -10,9 +12,11 @@ const BUCKET_SIZE = 1000 * 60 * 60 * 24 * 10
 // MakeBucket returns the bucket number based on the input ID.
 // It takes an integer ID as a parameter and returns an integer value.
 func MakeBucket(id int64) int64 {
-	snowflakeID := snowflake.ParseInt64(id)
+	if id == 0 {
+		return time.Now().Unix()*1000 - snowflake.Epoch
+	}
 
-	return snowflakeID.Time() / BUCKET_SIZE
+	return snowflake.ParseInt64(id).Time() / BUCKET_SIZE
 }
 
 // MakeBuckets generates a slice of integers representing the buckets between the startID and endID.

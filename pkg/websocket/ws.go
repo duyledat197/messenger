@@ -6,6 +6,7 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -41,8 +42,9 @@ var upgrader = websocket.Upgrader{
 
 // Client is a middleman between the websocket connection and the engine.
 type Client[T any] struct {
-	ID     string
-	UserID string
+	ID        string
+	ChannelID int64
+	UserID    string
 
 	Engine *Engine[T]
 
@@ -189,6 +191,18 @@ func ServeWs[T any](engine *Engine[T], tokenEngine *util.JWTAuthenticator, w htt
 		return
 	}
 
+	channelIDStr := r.URL.Query().Get("channel_id")
+	if channelIDStr == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	channelID, err := strconv.Atoi(channelIDStr)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	userClaims, err := tokenEngine.Verify(token)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -201,11 +215,12 @@ func ServeWs[T any](engine *Engine[T], tokenEngine *util.JWTAuthenticator, w htt
 		return
 	}
 	client := &Client[T]{
-		ID:     uuid.NewString(),
-		UserID: userClaims.Id,
-		Engine: engine,
-		conn:   conn,
-		Send:   make(chan T),
+		ID:        uuid.NewString(),
+		UserID:    userClaims.Id,
+		ChannelID: int64(channelID),
+		Engine:    engine,
+		conn:      conn,
+		Send:      make(chan T),
 	}
 
 	// Allow collection of memory referenced by the caller by doing all work in

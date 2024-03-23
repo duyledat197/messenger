@@ -8,34 +8,39 @@ import (
 	"openmyth/messgener/internal/chat/entity"
 	"openmyth/messgener/internal/chat/repository"
 	"openmyth/messgener/pkg/scylla"
+	"openmyth/messgener/util/cqlx_util"
+	"openmyth/messgener/util/database"
 )
 
-// metadata specifies table name and columns it must be in sync with schema.
-var onlineMetadata = table.Metadata{
-	Name:    "online",
-	Columns: []string{"user_id", "client_id"},
-	PartKey: []string{"user_id"},
-	SortKey: []string{},
-}
-
-// onlineTable allows for simple CRUD operations based on personMetadata.
-var onlineTable = table.New(onlineMetadata)
-
 type onlineRepository struct {
-	db *scylla.ScyllaClient
+	db  *scylla.ScyllaClient
+	tbl *table.Table
 }
 
 // NewOnlineRepository creates a new instance of the OnlineRepository interface.
-//
 // It returns a pointer to an onlineRepository struct that implements the OnlineRepository interface.
-func NewOnlineRepository() repository.OnlineRepository {
-	return &onlineRepository{}
+func NewOnlineRepository(db *scylla.ScyllaClient) repository.OnlineRepository {
+	e := &entity.Online{}
+	partKeys, sortKeys := cqlx_util.Fields(e)
+	fields, _ := database.FieldMap(e)
+
+	metadata := table.Metadata{
+		Name:    e.TableName(),
+		Columns: fields,
+		PartKey: partKeys,
+		SortKey: sortKeys,
+	}
+
+	return &onlineRepository{
+		db:  db,
+		tbl: table.New(metadata),
+	}
 }
 
 // RetrieveByUserID retrieves an online repository by user ID.
 func (r *onlineRepository) RetrieveByUserID(ctx context.Context, userID string) (*entity.Online, error) {
 	var result entity.Online
-	if err := onlineTable.
+	if err := r.tbl.
 		GetQueryContext(ctx, r.db.Session).
 		BindStruct(&entity.Online{UserID: userID}).
 		GetRelease(&result); err != nil {
@@ -46,12 +51,11 @@ func (r *onlineRepository) RetrieveByUserID(ctx context.Context, userID string) 
 }
 
 // Create creates a new record in the onlineRepository.
-//
-// ctx: context for the operation.
-// data: the entity.Online data to be inserted.
-// error: returns an error if the operation fails.
 func (r *onlineRepository) Create(ctx context.Context, data *entity.Online) error {
-	if err := onlineTable.InsertQueryContext(ctx, r.db.Session).BindStruct(data).ExecRelease(); err != nil {
+	if err := r.tbl.
+		InsertQueryContext(ctx, r.db.Session).
+		BindStruct(data).
+		ExecRelease(); err != nil {
 		return err
 	}
 
@@ -59,12 +63,11 @@ func (r *onlineRepository) Create(ctx context.Context, data *entity.Online) erro
 }
 
 // DeleteByUserID deletes an entry from the online repository based on the userID.
-//
-// ctx is the context for the operation.
-// userID is the identifier for the user.
-// Returns an error if any.
 func (r *onlineRepository) DeleteByUserID(ctx context.Context, userID string) error {
-	if err := onlineTable.DeleteQueryContext(ctx, r.db.Session).BindStruct(&entity.Online{UserID: userID}).ExecRelease(); err != nil {
+	if err := r.tbl.
+		DeleteQueryContext(ctx, r.db.Session).
+		BindStruct(&entity.Online{UserID: userID}).
+		ExecRelease(); err != nil {
 		return err
 	}
 
