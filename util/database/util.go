@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"slices"
 	"strings"
+
+	"github.com/iancoleman/strcase"
 )
 
 const DB_TAG = "db"
@@ -17,6 +19,10 @@ func FieldMap[T Entity](e T) ([]string, []any) {
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Type().Field(i)
 		fieldName := field.Tag.Get(DB_TAG)
+		if fieldName == "" {
+			fieldName = strcase.ToLowerCamel(field.Name)
+		}
+
 		fieldValue := v.Field(i).Addr().Interface()
 
 		fieldNames = append(fieldNames, fieldName)
