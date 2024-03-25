@@ -20,7 +20,7 @@ func FieldMap[T Entity](e T) ([]string, []any) {
 		field := v.Type().Field(i)
 		fieldName := field.Tag.Get(DB_TAG)
 		if fieldName == "" {
-			fieldName = strcase.ToLowerCamel(field.Name)
+			fieldName = strcase.ToSnake(field.Name)
 		}
 
 		fieldValue := v.Field(i).Addr().Interface()

@@ -1,7 +1,7 @@
 package entity
 
 type Online struct {
-	UserID   string
+	UserID   string `partkey:"user_id"`
 	ClientID string
 }
 
