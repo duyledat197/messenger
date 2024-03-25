@@ -1,0 +1,37 @@
+version: "3"
+services:
+  postgres:
+    image: 'postgres:latest'
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    volumes:
+      - ./db-data/:/var/lib/postgresql/data/
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+  
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./redis-data:/data
+
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - REDIS_HOSTS=redis-server
+    depends_on:
+      - redis
+
+  scylla:
+    image: scylladb/scylla:latest
+    restart: always
+    command: --seeds=scylla-node1,scylla-node2 --smp 1 --memory 750M
+    ports:
+      - 9100:9100 # Node Exporter
+      - 9180:9180 # Scylla Metrics
