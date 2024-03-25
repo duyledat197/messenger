@@ -3,7 +3,7 @@ package webrtc
 import "github.com/pion/webrtc/v3"
 
 // Add to list of tracks and fire renegotation for all PeerConnections
-func (wr *WebRTC) addTrack(channelID int64, t *webrtc.TrackRemote) *webrtc.TrackLocalStaticRTP {
+func (wr *SFU) addTrack(channelID int64, t *webrtc.TrackRemote) *webrtc.TrackLocalStaticRTP {
 	wr.Lock()
 	defer func() {
 		wr.Unlock()
@@ -21,7 +21,7 @@ func (wr *WebRTC) addTrack(channelID int64, t *webrtc.TrackRemote) *webrtc.Track
 }
 
 // Remove from list of tracks and fire renegotation for all PeerConnections
-func (wr *WebRTC) removeTrack(channelID int64, t *webrtc.TrackLocalStaticRTP) {
+func (wr *SFU) removeTrack(channelID int64, t *webrtc.TrackLocalStaticRTP) {
 	wr.Lock()
 	defer func() {
 		wr.Unlock()

@@ -10,7 +10,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type WebRTC struct {
+type SFU struct {
 	peerConnectionsMap map[int64]map[*peerConnectionState]bool
 	trackLocals        map[string]*webrtc.TrackLocalStaticRTP
 
@@ -18,16 +18,16 @@ type WebRTC struct {
 	sync.Mutex
 }
 
-// NewWebRTC initializes a new WebRTC instance.
-func NewWebRTC() *WebRTC {
-	return &WebRTC{
+// NewSFU initializes a new SFU instance.
+func NewSFU() *SFU {
+	return &SFU{
 		peerConnectionsMap: make(map[int64]map[*peerConnectionState]bool),
 		trackLocals:        make(map[string]*webrtc.TrackLocalStaticRTP),
 		isActive:           true,
 		Mutex:              sync.Mutex{},
 	}
 }
-func (wr *WebRTC) Start(_ context.Context) error {
+func (wr *SFU) Start(_ context.Context) error {
 
 	// request a keyframe every 3 seconds
 	for range time.NewTicker(time.Second * 3).C {
@@ -39,14 +39,14 @@ func (wr *WebRTC) Start(_ context.Context) error {
 	return nil
 }
 
-// Stop stops the WebRTC.
-func (wr *WebRTC) Stop(_ context.Context) error {
+// Stop stops the SFU.
+func (wr *SFU) Stop(_ context.Context) error {
 	wr.isActive = false
 
 	return nil
 }
 
-func (wr *WebRTC) dispatchKeyFrame() {
+func (wr *SFU) dispatchKeyFrame() {
 	wr.Lock()
 	defer wr.Unlock()
 

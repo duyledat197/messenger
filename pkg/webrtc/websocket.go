@@ -3,9 +3,11 @@ package webrtc
 import (
 	"encoding/json"
 	"log"
+	"log/slog"
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/pion/webrtc/v3"
@@ -13,12 +15,15 @@ import (
 
 var (
 	upgrader = websocket.Upgrader{
-		CheckOrigin: func(r *http.Request) bool { return true },
+		CheckOrigin:      func(r *http.Request) bool { return true },
+		HandshakeTimeout: time.Second * 2,
+		ReadBufferSize:   1024,
+		WriteBufferSize:  1024,
 	}
 )
 
-// ServeWs upgrades an HTTP request to Websocket, handles WebRTC signaling, and manages PeerConnections.
-func (wr *WebRTC) ServeWs(w http.ResponseWriter, r *http.Request) {
+// ServeWs upgrades an HTTP request to Websocket, handles SFU signaling, and manages PeerConnections.
+func (wr *SFU) ServeWs(w http.ResponseWriter, r *http.Request) {
 	// Upgrade HTTP request to Websocket
 	unsafeConn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -90,10 +95,12 @@ func (wr *WebRTC) ServeWs(w http.ResponseWriter, r *http.Request) {
 	for {
 		_, raw, err := c.ReadMessage()
 		if err != nil {
-			log.Println(err)
+			slog.Error("unable to read message: ", err)
 			return
-		} else if err := json.Unmarshal(raw, &message); err != nil {
-			log.Println(err)
+		}
+
+		if err := json.Unmarshal(raw, &message); err != nil {
+			slog.Error("unable to unmarshal message: ", err)
 			return
 		}
 
@@ -101,30 +108,30 @@ func (wr *WebRTC) ServeWs(w http.ResponseWriter, r *http.Request) {
 		case "candidate":
 			candidate := webrtc.ICECandidateInit{}
 			if err := json.Unmarshal([]byte(message.Data), &candidate); err != nil {
-				log.Println(err)
+				slog.Error("unable to unmarshal message: ", err)
 				return
 			}
 
 			if err := peerConnection.AddICECandidate(candidate); err != nil {
-				log.Println(err)
+				slog.Error("unable to add ICE candidate: ", err)
 				return
 			}
 		case "answer":
 			answer := webrtc.SessionDescription{}
 			if err := json.Unmarshal([]byte(message.Data), &answer); err != nil {
-				log.Println(err)
+				slog.Error("unable to unmarshal message: ", err)
 				return
 			}
 
 			if err := peerConnection.SetRemoteDescription(answer); err != nil {
-				log.Println(err)
+				slog.Error("unable to set remote description: ", err)
 				return
 			}
 		}
 	}
 }
 
-func (wr *WebRTC) setup(channelID int64, peerConnection *peerConnectionState) {
+func (wr *SFU) setup(channelID int64, peerConnection *peerConnectionState) {
 	// Trickle ICE. Emit server candidate to client
 	peerConnection.OnICECandidate(func(i *webrtc.ICECandidate) {
 		if i == nil {
