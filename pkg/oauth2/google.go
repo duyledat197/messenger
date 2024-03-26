@@ -1,52 +1,53 @@
 package oauth2
 
 import (
-	"log/slog"
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 )
 
-const oauth2state = "something"
-
+// GoogleFactory is a factory struct for Google OAuth2 authentication.
+// It contains a pointer to a Client.
 type GoogleFactory struct {
 	cfg *oauth2.Config
 }
 
-func NewGoogleFactory(clientID, clientSecret, redirectURL string) Factory {
+// NewGoogleFactory creates a new GoogleFactory instance.
+func NewGoogleFactory(cfg *oauth2.Config) Factory {
 	return &GoogleFactory{
-		cfg: &oauth2.Config{
-			ClientID:     clientID,
-			ClientSecret: clientSecret,
-			RedirectURL:  redirectURL,
-			Scopes: []string{
-				"https://www.googleapis.com/auth/userinfo.email",
-			},
-			Endpoint: google.Endpoint,
-		},
+		cfg: cfg,
 	}
 }
-func (f *GoogleFactory) Redirect(w http.ResponseWriter, r *http.Request) {
-	url := f.cfg.AuthCodeURL(oauth2state)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
-}
 
-func (f *GoogleFactory) CallBack(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	state := r.FormValue("state")
-	code := r.FormValue("code")
-
-	if state != oauth2state {
-		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
-	}
-
-	token, err := f.cfg.Exchange(ctx, code)
+// CallBack handles the callback from Google OAuth.
+// It takes in http.ResponseWriter and *http.Request as parameters.
+// Returns *Info and error.
+func (f *GoogleFactory) CallBack(w http.ResponseWriter, r *http.Request) (*Info, error) {
+	userInfoURL := "https://www.googleapis.com/oauth2/v2/userinfo"
+	b, err := retrieveUserInfo(f.cfg, w, r, userInfoURL)
 	if err != nil {
-		slog.Error("Exchange failed with " + err.Error() + "\n")
-		return
+		return nil, fmt.Errorf("unable to retrieve social user info: %w", err)
 	}
-	client := f.cfg.Client(ctx, token)
+	type info struct {
+		Email      string `json:"email"`
+		Name       string `json:"name"`
+		GivenName  string `json:"given_name"`
+		FamilyName string `json:"family_name"`
+		Picture    string `json:"picture"`
+		Gender     string `json:"gender"`
+		Locale     string `json:"locale"`
+	}
+	data := &info{}
+	if err := json.Unmarshal(b, data); err != nil {
+		return nil, fmt.Errorf("unable to unmarshal body: %w", err)
+	}
 
-	client.Get("https://www.googleapis.com/auth/userinfo.email")
+	return &Info{
+		Email:     data.Email,
+		AvatarURL: data.Picture,
+		Name:      data.Name,
+		Gender:    data.Gender,
+	}, nil
 }
