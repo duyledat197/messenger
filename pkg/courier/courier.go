@@ -4,7 +4,6 @@ package courier
 import (
 	"fmt"
 	"log"
-	"log/slog"
 	"strconv"
 
 	"github.com/gojek/courier-go"
@@ -18,8 +17,8 @@ import (
 // cfg - holds the configuration for the courier client
 // Client - holds the actual courier client
 type Client struct {
-	cfg             *config.Database // Holds the configuration for the courier client
 	*courier.Client                  // Holds the actual courier client
+	cfg             *config.Database // Holds the configuration for the courier client
 }
 
 // NewClient creates a new Client with the given configuration.
@@ -28,7 +27,7 @@ type Client struct {
 func NewClient(cfg *config.Database) *Client {
 	port, err := strconv.Atoi(cfg.Port)
 	if err != nil {
-		slog.Error("courier port is not correct")
+		log.Fatal("courier port is not correct")
 	}
 	client, err := courier.NewClient(
 		courier.WithUsername(cfg.User),
