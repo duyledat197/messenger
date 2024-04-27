@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package base;
+
+enum EventEncodeType {
+  EventEncodeType_JSON = 0;
+  EventEncodeType_Protobuf = 1;
+}

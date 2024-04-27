@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package msqueue;
+
+import "base/option.proto";
+import "base/type.proto";
+
+// consumer at backend/main
+message MailEvent {
+  option (ubasepb.event) = {
+    topic : "SEND_EMAIL_TOPIC",
+    encode_type : EventEncodeType_Protobuf
+  };
+  string to = 1;
+  string type = 2;
+  string code = 3;
+  string kind = 4;
+}

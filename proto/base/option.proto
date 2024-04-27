@@ -1,0 +1,17 @@
+
+syntax = "proto3";
+
+package base;
+
+import "google/protobuf/descriptor.proto";
+import "base/type.proto";
+
+message EventOptions {
+  string topic = 1;
+  EventEncodeType encode_type = 2; // default to json
+}
+
+extend google.protobuf.MessageOptions {
+  EventOptions event = 1520001;
+  // ConsumerOptions consumer = 1520002;
+}
