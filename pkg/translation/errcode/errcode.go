@@ -2,10 +2,9 @@
 package errcode
 
 import (
+	"embed"
 	"fmt"
-	"log/slog"
-	"os"
-	"path"
+	"log"
 
 	"github.com/BurntSushi/toml"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
@@ -14,6 +13,9 @@ import (
 
 var (
 	instance *i18n.Bundle
+
+	//go:embed *.toml
+	fs embed.FS
 )
 
 // GetInstance returns the i18n.Bundle error codes instance.
@@ -21,19 +23,23 @@ func GetInstance() *i18n.Bundle {
 	if instance == nil {
 		instance = i18n.NewBundle(language.English)
 		instance.RegisterUnmarshalFunc("toml", toml.Unmarshal)
-		rootDir := "./"
-		if _, err := os.Stat(path.Join(rootDir, "translation")); err != nil {
-			if os.IsNotExist(err) {
-				rootDir = "/opt/messenger"
-			} else {
-				slog.Error("unable to load translation file", err)
-				return nil
-			}
+		dir, err := fs.ReadDir(".")
+		if err != nil {
+			log.Fatalf("unable to read dir: %v", err)
 		}
-		transDir := path.Join(rootDir, "translation", "errcode")
 
-		instance.MustLoadMessageFile(path.Join(transDir, "vi.toml"))
-		instance.MustLoadMessageFile(path.Join(transDir, "en.toml"))
+		for _, entry := range dir {
+			info, err := entry.Info()
+			if err != nil {
+				log.Fatalf("unable to get info: %v", err)
+			}
+			b, err := fs.ReadFile(info.Name())
+			if err != nil {
+				log.Fatalf("unable to read file: %v", err)
+			}
+
+			instance.MustParseMessageFileBytes(b, info.Name())
+		}
 	}
 
 	return instance
@@ -42,7 +48,6 @@ func GetInstance() *i18n.Bundle {
 // RetrieveTranslate retrieves a message for a given key and language.
 func RetrieveTranslate(key string, lang string) string {
 	localizer := i18n.NewLocalizer(GetInstance(), lang, language.English.String(), language.Chinese.String())
-
 	msgVal, err := localizer.Localize(&i18n.LocalizeConfig{
 		MessageID: key,
 	})
