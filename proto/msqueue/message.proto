@@ -1,14 +1,26 @@
 syntax = "proto3";
-
 package msqueue;
+option go_package = "openmyth/messgener/pb/msqueue;pb";
 
 import "base/option.proto";
 import "base/type.proto";
 
 // consumer at backend/main
-message MailEvent {
-  option (ubasepb.event) = {
-    topic : "SEND_EMAIL_TOPIC",
+message EventJson {
+  option (base.event) = {
+    topic : "TEST_EVENT_JSON_TOPIC",
+    encode_type : EventEncodeType_JSON
+  };
+  string to = 1;
+  string type = 2;
+  string code = 3;
+  string kind = 4;
+}
+
+// consumer at backend/main
+message EventProtobuf {
+  option (base.event) = {
+    topic : "TEST_EVENT_PROTOBUF_TOPIC",
     encode_type : EventEncodeType_Protobuf
   };
   string to = 1;

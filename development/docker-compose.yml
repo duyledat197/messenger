@@ -9,7 +9,7 @@ services:
     volumes:
       - ./db-data/:/var/lib/postgresql/data/
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-  
+
   redis:
     image: redis
     restart: always
@@ -35,3 +35,12 @@ services:
     ports:
       - 9100:9100 # Node Exporter
       - 9180:9180 # Scylla Metrics
+  generate_pb_go:
+    image: gen-go
+    build:
+      context: ../
+      target: protoc_gen_go
+      dockerfile: ./development/proto.Dockerfile
+    volumes:
+      - "../:/app/"
+    entrypoint: /app/development/gen-proto.sh
