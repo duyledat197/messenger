@@ -14,3 +14,11 @@ func (c *Client) Publish(ctx context.Context, topic string, message []byte) erro
 
 	return nil
 }
+
+// Subscribe allows to subscribe to messages from an MQTT broker
+func (c *Client) Subscribe(ctx context.Context, topic string, fn func(ctx context.Context, data []byte) error) {
+	// TODO: implement subscribe with custom marshaler
+	// c.Client.Subscribe(ctx, topic, func(ctx context.Context, ps courier.PubSub, m *courier.Message) {
+	// fn(ctx,m.DecodePayload())
+	// })
+}

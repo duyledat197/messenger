@@ -4,6 +4,8 @@ package websocket
 import (
 	"context"
 	"log/slog"
+
+	"openmyth/messgener/util"
 )
 
 type SendInfo[T any] struct {
@@ -27,15 +29,18 @@ type Engine[T any] struct {
 	unregister chan *Client[T] // unregister a client from the hub.
 
 	Send chan SendInfo[T]
+
+	tokenEngine *util.JWTAuthenticator
 }
 
 // NewEngine creates a new Engine and returns a pointer to it.
-func NewEngine[T any]() *Engine[T] {
+func NewEngine[T any](tokenEngine *util.JWTAuthenticator) *Engine[T] {
 	return &Engine[T]{
-		broadcast:  make(chan T),
-		register:   make(chan *Client[T]),
-		unregister: make(chan *Client[T]),
-		clients:    make(map[string]*Client[T]),
+		broadcast:   make(chan T),
+		register:    make(chan *Client[T]),
+		unregister:  make(chan *Client[T]),
+		clients:     make(map[string]*Client[T]),
+		tokenEngine: tokenEngine,
 	}
 }
 

@@ -6,14 +6,12 @@ import (
 	"log"
 	"log/slog"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
-
-	"openmyth/messgener/util"
+	"github.com/spf13/cast"
 )
 
 const (
@@ -36,8 +34,9 @@ var (
 )
 
 var upgrader = websocket.Upgrader{
-	ReadBufferSize:    1024,
-	WriteBufferSize:   1024,
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	// TODO: for security just accept some origin
 	CheckOrigin:       func(r *http.Request) bool { return true },
 	HandshakeTimeout:  time.Second * 2,
 	EnableCompression: true,
@@ -142,6 +141,7 @@ func (c *Client[T]) writePump() {
 				return
 			}
 
+			// TODO: support multi marshaler
 			bData, err := json.Marshal(message)
 			if err != nil {
 				log.Printf("unable to marshal: %v", err)
@@ -157,6 +157,7 @@ func (c *Client[T]) writePump() {
 				if _, err := w.Write(newline); err != nil {
 					log.Printf("unable to write message: %v", err)
 				}
+				// TODO: support multi marshaler
 				bData, err := json.Marshal(<-c.Send)
 				if err != nil {
 					log.Printf("unable to marshal: %v", err)
@@ -165,6 +166,7 @@ func (c *Client[T]) writePump() {
 
 				if _, err := w.Write(bData); err != nil {
 					log.Printf("unable to write message: %v", err)
+					return
 				}
 			}
 
@@ -187,7 +189,7 @@ func (c *Client[T]) writePump() {
 }
 
 // ServeWs handles websocket requests from the peer.
-func ServeWs[T any](engine *Engine[T], tokenEngine *util.JWTAuthenticator, w http.ResponseWriter, r *http.Request) {
+func ServeWs[T any](engine *Engine[T], w http.ResponseWriter, r *http.Request) {
 	schema, token, ok := strings.Cut(r.Header.Get("Authorization"), " ")
 	if !ok || strings.ToLower(schema) != "bearer" {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -200,21 +202,17 @@ func ServeWs[T any](engine *Engine[T], tokenEngine *util.JWTAuthenticator, w htt
 		return
 	}
 
-	channelID, err := strconv.Atoi(channelIDStr)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	channelID := cast.ToInt64(channelIDStr)
 
-	userClaims, err := tokenEngine.Verify(token)
+	userClaims, err := engine.tokenEngine.Verify(token)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 	}
 
+	// TODO: set up response header
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-
 		return
 	}
 	client := &Client[T]{
@@ -229,13 +227,14 @@ func ServeWs[T any](engine *Engine[T], tokenEngine *util.JWTAuthenticator, w htt
 	// Allow collection of memory referenced by the caller by doing all work in
 	client.Engine.register <- client
 
+	if err := client.Impl.Register(client.ID, client.UserID); err != nil {
+		log.Printf("unable to register: %v", err)
+		w.WriteHeader(http.StatusBadGateway)
+		return
+	}
+
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.
 	go client.writePump()
 	go client.readPump()
-
-	if err := client.Impl.Register(client.ID, client.UserID); err != nil {
-		log.Printf("unable to register: %v", err)
-		return
-	}
 }

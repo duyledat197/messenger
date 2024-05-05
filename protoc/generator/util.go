@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"runtime/debug"
 	"strings"
 
 	"github.com/modern-go/reflect2"
@@ -26,6 +27,10 @@ func getOption(message protoreflect.Message, extension *protoimpl.ExtensionInfo)
 		return nil, false
 	}
 
+	// TODO: use reflection to get the option
+	// ext := proto.GetExtension(meth.Options, options.E_Http)
+	// opts, ok := ext.(*options.HttpRule)
+
 	return inter, true
 }
 
@@ -47,4 +52,16 @@ func getGoPackageName(file *descriptorpb.FileDescriptorProto) (impPath string, p
 		return opt, opt[slash+1:], true
 	}
 	return "", opt, true
+}
+
+type BuildInfoReaderFunc = func() (*debug.BuildInfo, bool)
+
+// GetVersion description of the Go function.
+func GetVersion(infoReader BuildInfoReaderFunc) string {
+	info, ok := infoReader()
+	if !ok || info.Main.Version == "" {
+		return "(unknown)"
+	}
+
+	return info.Main.Version
 }
