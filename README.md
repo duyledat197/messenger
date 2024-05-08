@@ -26,7 +26,8 @@ Design a messenger platform that can serve for around more than 100M users. The 
 ![chatting_high_level_design drawio](https://github.com/duyledat197/messenger/assets/38448882/c592f2b1-18d3-4dc6-8e95-8af82e02eeec)
 
 ## Emoji
-![messenger_emoji_high_level_design](https://github.com/duyledat197/messenger/assets/38448882/f7355717-adca-4b87-aa97-c255ddbdd2a3)
+![messenger_high_level_design](https://github.com/duyledat197/messenger/assets/38448882/a6af24ec-0cf7-44e4-8caa-6b58d5468066)
+
 
 
 # Protocols
