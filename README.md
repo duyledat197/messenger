@@ -22,17 +22,17 @@ Design a messenger platform that can serve for around more than 100M users. The 
 - Number of messages per second at peak traffic: 10M
 - Estimate Database store size: 1M users * 5KB per user
 # High-level Design
-## Chatting
+## General Design
+![messenger_high_level_design general](https://github.com/duyledat197/messenger/assets/38448882/3ff9e178-ff47-4fda-9c76-5fd99b62da7e)
+
+## Chatting Design
 ![chatting_high_level_design drawio](https://github.com/duyledat197/messenger/assets/38448882/c592f2b1-18d3-4dc6-8e95-8af82e02eeec)
 
-## Emoji
+## Emoji Design
 ![messenger_high_level_design](https://github.com/duyledat197/messenger/assets/38448882/a6af24ec-0cf7-44e4-8caa-6b58d5468066)
 
-
-
 # Protocols
-- Pros/Cons Between databases
-- Decided or Plan
+
 # Database
 - Pros/Cons Between databases
 - Decided or Plan
