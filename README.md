@@ -23,7 +23,7 @@ Design a messenger platform that can serve for around more than 100M users. The 
 - Estimate Database store size: 1M users * 5KB per user
 # High-level Design
 ## General Design
-![messenger_high_level_design general](https://github.com/duyledat197/messenger/assets/38448882/3ff9e178-ff47-4fda-9c76-5fd99b62da7e)
+![messenger_high_level_design general](https://github.com/duyledat197/messenger/assets/38448882/0fb884be-78e1-41f0-bfc6-1c4590dd8b8d)
 
 ## Chatting Design
 ![chatting_high_level_design drawio](https://github.com/duyledat197/messenger/assets/38448882/c592f2b1-18d3-4dc6-8e95-8af82e02eeec)
