@@ -2,20 +2,20 @@
 Design a messenger platform that can serve for around more than 100M users. The platform supports web and mobile apps(android, ios).
 # Gathering Requirements
 - Chatting:
-+ Support one-on-one conversation.
-+ Support group chat that has more than 1000 users per group.
-+ Support those who already read the last message.
-+ Support message sent time and message read time per user.
+  + Support one-on-one conversation.
+  + Support group chat that has more than 1000 users per group.
+  + Support those who already read the last message.
+  + Support message sent time and message read time per user.
 - Sending file, and attachment in a conversation:
-+ Maximum size of a file, attachment is 5MB.
-+ Maximum per sending is 5 files.
-+ Just support image types(jpg, jpeg, png, SVG, ...) or document types(doc, docx, csv, xlsx).
-+ Support emoji reaction for each message.
+  + Maximum size of a file, attachment is 5MB.
+  + Maximum per sending is 5 files.
+  + Just support image types(jpg, jpeg, png, SVG, ...) or document types(doc, docx, csv, xlsx).
+  + Support emoji reaction for each message.
 - Story video:
-+ User can post brief videos.
-+ User can post 10 brief videos per day.
-+ Video duration must not exceed 60 seconds.
-+ Support emoji reaction for each video.
+  + User can post brief videos.
+  + User can post 10 brief videos per day.
+  + Video duration must not exceed 60 seconds.
+  + Support emoji reaction for each video.
 # Capacity Planning
 - Number of users on the application every month: 1M
 - Number of active users per second at peak traffic: 500K
