@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package user;
+option go_package = "pb/user;pb";
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+service AuthService {
+  rpc Login(LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post : "/v1/auth/login"
+      body : "*"
+    };
+  };
+  rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse) {
+    option (google.api.http) = {
+      post : "/v1/auth/forgot-password"
+      body : "*"
+    };
+  };
+  rpc Disable2FA(Disable2FARequest) returns (Disable2FAResponse) {
+    option (google.api.http) = {
+      post : "/v1/auth/otp/disable"
+      body : "*"
+    };
+  };
+  rpc GenerateOTP(GenerateOTPRequest) returns (GenerateOTPResponse) {
+    option (google.api.http) = {
+      post : "/v1/auth/otp/generate"
+      body : "*"
+    };
+  };
+  rpc VerifyOTP(VerifyOTPRequest) returns (VerifyOTPResponse) {
+    option (google.api.http) = {
+      post : "/v1/auth/otp/verify"
+      body : "*"
+    };
+  };
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse) {
+    option (google.api.http) = {
+      post : "/v1/auth/reset-password"
+      body : "*"
+    };
+  }
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse) {
+    option (google.api.http) = {
+      put : "/v1/auth/change-password"
+      body : "*"
+    };
+  };
+
+  rpc Enable2FA(Enable2FARequest) returns (Enable2FAResponse) {
+    option (google.api.http) = {
+      post : "/v1/auth/otp/enable"
+      body : "*"
+    };
+  };
+  // rpc VerifyPhoneNumber(VerifyPhoneNumberRequest)
+  //     returns (VerifyPhoneNumberResponse) {
+  //   option (google.api.http) = {
+  //     post : "/v1/auth/verify-phone-number"
+  //     body : "*"
+  //   };
+  // }
+}
+// for user(partner and end-user)
+message LoginRequest {
+  string username = 1 [ (validate.rules).string = {min_len : 4, max_len : 20} ];
+  string password = 3 [ (validate.rules).string = {min_len : 6, max_len : 20} ];
+}
+
+message LoginResponse {
+  // User user = 1;
+  string token = 2;
+}
+
+// generate section
+message ForgotPasswordRequest {
+  string phone = 1 [ (validate.rules).string = {min_len : 10, max_len : 11} ];
+}
+
+message ForgotPasswordResponse { string token = 1; }
+
+message VerifyOTPRequest { string otp = 1; }
+
+message VerifyOTPResponse {}
+
+message ResetPasswordRequest {
+  string phone = 1 [ (validate.rules).string = {min_len : 10, max_len : 11} ];
+  string token = 2;
+  string new_password = 3
+      [ (validate.rules).string = {min_len : 6, max_len : 20} ];
+}
+
+message ResetPasswordResponse {}
+
+message ChangePasswordRequest {
+  string phone = 1 [ (validate.rules).string = {min_len : 10, max_len : 11} ];
+  string password = 2 [ (validate.rules).string = {min_len : 6, max_len : 20} ];
+  string new_password = 3
+      [ (validate.rules).string = {min_len : 6, max_len : 20} ];
+}
+
+message ChangePasswordResponse {}
+
+// message VerifyPhoneNumberRequest { string phone = 1; }
+
+// message VerifyPhoneNumberResponse {}
+
+message GenerateOTPRequest {}
+message GenerateOTPResponse {
+  string otp_auth_url = 1;
+  string base32 = 2;
+}
+
+message Disable2FARequest {}
+message Disable2FAResponse {}
+
+message Enable2FARequest {}
+message Enable2FAResponse {}

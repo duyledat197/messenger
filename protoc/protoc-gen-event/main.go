@@ -25,7 +25,7 @@ func main() {
 			}
 			gen := generator.NewGenerator(p, f, extensionName)
 
-			msgEvents, err := gen.GetOptionInfos(pb.E_Event)
+			msgEvents, err := gen.GetMessageOptionInfos(pb.E_Event)
 			if err != nil {
 				grpclog.Errorf("unable to generate event: %v", err)
 			}
@@ -49,9 +49,10 @@ func main() {
 
 			gen.GetJen().Add(marshalStmts...)
 			gen.GetJen().Add(unmarshalStmts...)
-
-			if err := gen.Render(); err != nil {
-				grpclog.Errorf("unable to generate event: %v", err)
+			if len(topicConstStmts) > 0 {
+				if err := gen.Render(); err != nil {
+					grpclog.Errorf("unable to generate %s: %v", extensionName, err)
+				}
 			}
 		}
 

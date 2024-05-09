@@ -7,6 +7,7 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/runtime/protoimpl"
+	"google.golang.org/protobuf/types/descriptorpb"
 )
 
 type Generator struct {
@@ -19,6 +20,7 @@ type Generator struct {
 	extensionName string
 }
 
+// NewGenerator creates a new Generator instance with the specified plugin, file, and extensionName.
 func NewGenerator(plugin *protogen.Plugin, file *protogen.File, extensionName string) *Generator {
 	_, packageName, _ := getGoPackageName(file.Proto)
 	gf := jen.NewFile(packageName)
@@ -41,13 +43,13 @@ func NewGenerator(plugin *protogen.Plugin, file *protogen.File, extensionName st
 	}
 }
 
-// GetOptionInfos retrieves the option information for a given proto extension.
+// GetMessageOptionInfos retrieves the option information for a given proto extension.
 //
 // It takes a pointer to a protoimpl.ExtensionInfo as a parameter.
 // The function iterates over the message types in the file and checks if the options contain the given extension.
 // If the extension is found, the function retrieves the option and appends it to the result slice.
 // The function returns the result slice containing the option information and a nil error.
-func (g *Generator) GetOptionInfos(e *protoimpl.ExtensionInfo) (map[string]proto.Message, error) {
+func (g *Generator) GetMessageOptionInfos(e *protoimpl.ExtensionInfo) (map[string]proto.Message, error) {
 	result := make(map[string]proto.Message)
 	for _, fd := range g.file.Proto.GetMessageType() {
 		if !proto.HasExtension(fd.GetOptions(), e) {
@@ -61,6 +63,28 @@ func (g *Generator) GetOptionInfos(e *protoimpl.ExtensionInfo) (map[string]proto
 	}
 
 	return result, nil
+}
+
+// GetEnumInfos returns the list of protogen.Enums from the Generator.
+// It returns a slice of pointers to protogen.Enum.
+func (g *Generator) GetEnumInfos() []*protogen.Enum {
+	return g.file.Enums
+
+}
+
+func (g *Generator) GetMethodDescInfos() map[string][]*descriptorpb.MethodDescriptorProto {
+	result := make(map[string][]*descriptorpb.MethodDescriptorProto)
+	for _, svc := range g.file.Proto.GetService() {
+		svcName := svc.GetName()
+		for _, m := range svc.Method {
+			if _, ok := result[svcName]; !ok {
+				result[svc.GetName()] = make([]*descriptorpb.MethodDescriptorProto, 0)
+			}
+			result[svc.GetName()] = append(result[svcName], m)
+		}
+	}
+
+	return result
 }
 
 // GetJen returns the Jen file from the Generator.

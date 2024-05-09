@@ -28,3 +28,8 @@ message EventProtobuf {
   string code = 3;
   string kind = 4;
 }
+
+enum Test {
+  A = 0;
+  B = 1;
+}

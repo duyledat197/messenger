@@ -16,10 +16,18 @@ RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 RUN go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway@latest
 RUN go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2@latest
 RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-RUN go install github.com/envoyproxy/protoc-gen-validate@latest
+RUN go install github.com/envoyproxy/protoc-gen-validate@v0.9.1
 RUN go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest
+
+RUN go mod download github.com/googleapis/googleapis@v0.0.0-20221209211743-f7f499371afa
+
+ENV MOD=$GOPATH/pkg/mod
+RUN mv $MOD/github.com/envoyproxy/protoc-gen-validate@v0.9.1/validate /usr/local/include/
+RUN mv $MOD/github.com/googleapis/googleapis@v0.0.0-20221209211743-f7f499371afa/google/* /usr/local/include/google/
 
 WORKDIR /app
 COPY .. .
 
 RUN go install ./protoc/protoc-gen-event/.
+RUN go install ./protoc/protoc-gen-enum/.
+RUN go install ./protoc/protoc-gen-http/.
