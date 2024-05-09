@@ -8,15 +8,18 @@ require (
 	github.com/blevesearch/bleve_index_api v1.1.6
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/dave/jennifer v1.7.0
+	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/gocql/gocql v0.0.0-20211015133455-b225f9b53fa1
 	github.com/gojek/courier-go v0.5.3
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.19.1
 	github.com/iancoleman/strcase v0.3.0
 	github.com/lib/pq v1.10.9
 	github.com/modern-go/reflect2 v1.0.2
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
+	github.com/opensearch-project/opensearch-go/v2 v2.3.0
 	github.com/pion/rtcp v1.2.14
 	github.com/pion/webrtc/v3 v3.2.29
 	github.com/reddit/jwt-go v3.2.1+incompatible
@@ -28,7 +31,7 @@ require (
 	golang.org/x/oauth2 v0.16.0
 	golang.org/x/sync v0.6.0
 	golang.org/x/text v0.14.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20240123012728-ef4313101c80
+	google.golang.org/genproto/googleapis/api v0.0.0-20240125205218-1f4bbc51befe
 	google.golang.org/grpc v1.62.1
 	google.golang.org/protobuf v1.33.0
 )

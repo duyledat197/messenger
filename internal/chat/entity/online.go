@@ -5,7 +5,10 @@ type Online struct {
 	ClientID string
 }
 
-// TableName returns the name of the table for the Online struct.
+// TableName returns the table name for the Online struct.
+//
+// This function does not take any parameters.
+// It returns a string representing the table name for the Online struct.
 func (aa *Online) TableName() string {
 	return "onlines"
 }

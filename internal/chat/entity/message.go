@@ -9,6 +9,10 @@ type Message struct {
 	Reaction  []string `json:"reaction"`
 }
 
+// TableName returns the name of the table for the Message struct.
+//
+// This function does not take any parameters.
+// It returns a string representing the table name for the Message struct.
 func (aa *Message) TableName() string {
 	return "messages"
 }
