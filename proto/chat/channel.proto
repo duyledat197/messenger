@@ -1,0 +1,30 @@
+syntax = "proto3";
+option go_package = "openmyth/messgener/pb/chat";
+package chat;
+
+import "google/api/annotations.proto";
+// import "validate/validate.proto";
+
+service ChannelService {
+  rpc SearchChannelByName(SearchChannelByNameRequest)
+      returns (SearchChannelByNameResponse) {
+    option (google.api.http) = {
+      post : "/v1/channels"
+      body : "*"
+    };
+  };
+}
+
+message Channel {
+  int64 channel_id = 1;
+  string name = 2;
+  string description = 3;
+}
+
+message SearchChannelByNameRequest {
+  string name = 1;
+  int64 offset = 2;
+  int64 limit = 3;
+}
+
+message SearchChannelByNameResponse { repeated Channel channels = 1; }

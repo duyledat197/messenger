@@ -1,0 +1,42 @@
+syntax = "proto3";
+option go_package = "openmyth/messgener/pb/chat";
+package chat;
+
+import "google/api/annotations.proto";
+// import "validate/validate.proto";
+
+service MessageService {
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+
+  rpc GetMessageLisyChannel(GetMessageLisyChannelRequest)
+      returns (GetMessageLisyChannelResponse) {
+    option (google.api.http) = {
+      post : "/v1/channels/{channel_id}/messages"
+      body : "*"
+    };
+  };
+}
+
+message Message {
+  string channel_id = 1;
+  string message_id = 2;
+  string user_id = 3;
+  string content = 4;
+  repeated string reaction = 5;
+}
+
+message SendMessageRequest {
+  string channel_id = 1;
+  string content = 2;
+  string user_id = 3;
+}
+
+message SendMessageResponse {}
+
+message GetMessageLisyChannelRequest {
+  string channel_id = 1;
+  int64 offset = 2;
+  int64 limit = 3;
+}
+
+message GetMessageLisyChannelResponse { repeated Message messages = 1; }
