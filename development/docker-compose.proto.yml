@@ -8,5 +8,5 @@ services:
       dockerfile: ./development/proto.Dockerfile
     volumes:
       - "../:/app/"
-      - "./pb:/app/openmyth/messgener/pb"
+      - "../pb:/app/openmyth/messgener/pb"
     entrypoint: /app/development/gen-proto.sh

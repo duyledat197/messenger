@@ -1,6 +1,6 @@
 syntax = "proto3";
 package msqueue;
-option go_package = "pb/msqueue;pb";
+option go_package = "openmyth/messgener/pb/msqueue";
 
 import "base/option.proto";
 import "base/type.proto";
@@ -27,9 +27,4 @@ message EventProtobuf {
   string type = 2;
   string code = 3;
   string kind = 4;
-}
-
-enum Test {
-  A = 0;
-  B = 1;
 }

@@ -10,6 +10,9 @@ type messageService struct {
 	pb.UnimplementedMessageServiceServer
 }
 
+// NewMessageService returns a new instance of the pb.MessageServiceServer interface.
+//
+// It takes no parameters and returns a pointer to a messageService struct that implements the pb.MessageServiceServer interface.
 func NewMessageService() pb.MessageServiceServer {
 	return &messageService{}
 }
