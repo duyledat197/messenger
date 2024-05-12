@@ -94,17 +94,17 @@ func (r *channelRepository) RetrieveByChannelID(ctx context.Context, id int64) (
 // SearchByName searches for channels by name in the repository.
 // It takes a context.Context and the name to search for as parameters.
 // It returns a slice of *entity.Channel and an error.
-func (r *channelRepository) SearchByName(ctx context.Context, name string) ([]*entity.Channel, error) {
+func (r *channelRepository) SearchByName(ctx context.Context, name string, offset, limit int64) ([]*entity.Channel, error) {
 	content := strings.NewReader(fmt.Sprintf(`{
-		"from": 0,
-		"size": 10,
+		"from": %d,
+		"size": %d,
 		"query": {
 			"match": {
 				"name": %s
 			}
 		}
 	}
-}`, name))
+}`, offset, limit, name))
 	e := &entity.Channel{}
 	search := opensearchapi.SearchRequest{
 		Index: []string{e.TableName()},

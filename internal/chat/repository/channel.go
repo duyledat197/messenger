@@ -10,6 +10,6 @@ import (
 type ChannelRepository interface {
 	Create(context.Context, *entity.Channel) error
 	RetrieveByChannelID(context.Context, int64) (*entity.Channel, error)
-	SearchByName(context.Context, string) ([]*entity.Channel, error)
+	SearchByName(ctx context.Context, name string, offset, limit int64) ([]*entity.Channel, error)
 	Delete(context.Context, int64) error
 }

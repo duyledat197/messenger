@@ -1,9 +1,10 @@
 package entity
 
 type Channel struct {
-	ChannelID int64  `json:"channel_id,omitempty"`
-	Name      string `json:"name,omitempty"`
-	MaxUser   uint32 `json:"max_user,omitempty"`
+	ChannelID   int64  `json:"channel_id,omitempty"`
+	Name        string `json:"name,omitempty"`
+	MaxUser     uint32 `json:"max_user,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 // TableName returns the table name for the Channel struct.

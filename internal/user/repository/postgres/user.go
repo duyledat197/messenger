@@ -67,3 +67,18 @@ func (u *userRepository) UpdateInfoByID(ctx context.Context, db database.Executo
 
 	return nil
 }
+
+// RetrieveByUserName retrieves a user from the userRepository based on the provided username.
+func (u *userRepository) RetrieveByUserName(ctx context.Context, db database.Executor, userName string) (*entity.User, error) {
+	e := &entity.User{}
+	fields, values := database.FieldMap(e)
+	stmt := fmt.Sprintf(`SELECT %s FROM %s WHERE username = $1`,
+		strings.Join(fields, ","),
+		e.TableName(),
+	)
+	if err := db.QueryRowContext(ctx, stmt, &userName).Scan(values...); err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}

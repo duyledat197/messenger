@@ -1,3 +1,4 @@
+-- create messages table
 CREATE TABLE messages (
    user_id text,
    bucket int,

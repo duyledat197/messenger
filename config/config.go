@@ -11,8 +11,7 @@ type Config struct {
 	PostgresDB     *Database
 	HTTP           *Endpoint
 	UserService    *Endpoint
-	ProductService *Endpoint
-	CouponService  *Endpoint
+	ChatService    *Endpoint
 	GatewayService *Endpoint
 	SymetricKey    string
 	FileLogOutPut  string
@@ -27,8 +26,8 @@ type config struct {
 	DBDatabase      string `mapstructure:"DB_NAME"`
 	UserGRPCHost    string `mapstructure:"USER_GRPC_HOST"`
 	UserGRPCPort    string `mapstructure:"USER_GRPC_PORT"`
-	ProductGRPCHost string `mapstructure:"PRODUCT_GRPC_HOST"`
-	ProductGRPCPort string `mapstructure:"PRODUCT_GRPC_PORT"`
+	ChatGRPCHost    string `mapstructure:"CHAT_GRPC_HOST"`
+	ChatGRPCPort    string `mapstructure:"CHAT_GRPC_PORT"`
 	CouponGRPCHost  string `mapstructure:"COUPON_GRPC_HOST"`
 	CouponGRPCPort  string `mapstructure:"COUPON_GRPC_PORT"`
 	GatewayGRPCHost string `mapstructure:"GATEWAY_GRPC_HOST"`
@@ -73,13 +72,9 @@ func LoadConfig(path string, env string) (*Config, error) {
 			Host: cfg.UserGRPCHost,
 			Port: cfg.UserGRPCPort,
 		},
-		ProductService: &Endpoint{
-			Host: cfg.ProductGRPCHost,
-			Port: cfg.ProductGRPCPort,
-		},
-		CouponService: &Endpoint{
-			Host: cfg.CouponGRPCHost,
-			Port: cfg.CouponGRPCPort,
+		ChatService: &Endpoint{
+			Host: cfg.ChatGRPCHost,
+			Port: cfg.ChatGRPCPort,
 		},
 		GatewayService: &Endpoint{
 			Host: cfg.GatewayGRPCHost,

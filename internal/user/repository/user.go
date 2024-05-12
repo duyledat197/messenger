@@ -14,4 +14,6 @@ type UserRepository interface {
 
 	// UpdateInfoByID updates the information for a user with the specified ID.
 	UpdateInfoByID(ctx context.Context, db database.Executor, id string, data *entity.User) error
+
+	RetrieveByUserName(ctx context.Context, db database.Executor, userName string) (*entity.User, error)
 }

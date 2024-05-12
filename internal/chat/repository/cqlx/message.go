@@ -54,20 +54,22 @@ func (r *messageRepository) Create(ctx context.Context, data *entity.Message) er
 
 // RetrieveByUserID retrieves a list of messages for a given user ID, starting from the specified offset and limited to the specified limit.
 func (r *messageRepository) RetrieveMessages(ctx context.Context, channelID, offset, limit int64) ([]*entity.Message, error) {
+	buckets := snowflake.MakeBuckets(channelID, offset)
 	var result []*entity.Message
 	if err := r.tbl.
 		SelectBuilder().
 		Where(
 			qb.Eq("channel_id"),
-			qb.Eq("bucket"),
+			qb.In("buckets"),
 			qb.Gt("message_id"),
 		).
+		LimitPerPartition(uint(limit)).
 		Limit(uint(limit)).
 		QueryContext(ctx, r.db.Session).
-		BindStruct(&entity.Message{
-			ChannelID: channelID,
-			Bucket:    snowflake.MakeBucket(offset),
-			MessageID: offset,
+		BindMap(map[string]any{
+			"channel_id": channelID,
+			"buckets":    buckets,
+			"message_id": offset,
 		}).
 		SelectRelease(&result); err != nil {
 		return nil, err

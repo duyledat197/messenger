@@ -377,9 +377,11 @@
     "userLoginResponse": {
       "type": "object",
       "properties": {
+        "user": {
+          "$ref": "#/definitions/userUser"
+        },
         "token": {
-          "type": "string",
-          "title": "User user = 1;"
+          "type": "string"
         }
       }
     },
@@ -399,6 +401,32 @@
     },
     "userResetPasswordResponse": {
       "type": "object"
+    },
+    "userUser": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "gmail": {
+          "type": "string"
+        },
+        "facebook": {
+          "type": "string"
+        },
+        "discord": {
+          "type": "string"
+        },
+        "github": {
+          "type": "string"
+        }
+      }
     },
     "userVerifyOTPRequest": {
       "type": "object",

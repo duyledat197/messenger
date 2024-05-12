@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package user;
+option go_package = "openmyth/messgener/pb/user";
+
+message User {
+  string username = 1;
+  string phone = 2;
+  string email = 3;
+  string gmail = 4;
+  string facebook = 5;
+  string discord = 6;
+  string github = 7;
+}
