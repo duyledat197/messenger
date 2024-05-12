@@ -8,6 +8,8 @@ import (
 
 	"github.com/gocql/gocql"
 	"github.com/scylladb/gocqlx/v2"
+
+	"openmyth/messgener/config"
 )
 
 // ScyllaClient represents a Scylla database session.
@@ -26,9 +28,9 @@ type ScyllaClient struct {
 //
 // It takes a string parameter `addr` which represents the address of the Scylla cfg.
 // The function returns a pointer to a `gocqlx.Session` object.
-func NewScylla(addr string) *ScyllaClient {
+func NewScylla(config *config.Database) *ScyllaClient {
 
-	cfg := gocql.NewCluster(addr)
+	cfg := gocql.NewCluster(config.Address())
 	cfg.ConnectTimeout = 2 * time.Second
 	cfg.Timeout = time.Second
 	cfg.NumConns = 5

@@ -19,6 +19,19 @@ type channelService struct {
 	pb.UnimplementedChannelServiceServer
 }
 
+// NewChannelService creates a new instance of the pb.ChannelServiceServer interface.
+// It takes a channelRepo of type repository.ChannelRepository and an idGenerator of type snowflake.Generator as parameters.
+// It returns a pointer to a channelService struct that implements the pb.ChannelServiceServer interface.
+func NewChannelService(
+	channelRepo repository.ChannelRepository,
+	idGenerator snowflake.Generator,
+) pb.ChannelServiceServer {
+	return &channelService{
+		idGenerator: idGenerator,
+		channelRepo: channelRepo,
+	}
+}
+
 // SearchChannelByName searches for channels by name in the channel repository.
 // It takes a context.Context and a SearchChannelByNameRequest as parameters.
 // It returns a SearchChannelByNameResponse and an error.

@@ -1,20 +1,28 @@
 package config
 
 import (
-	"fmt"
+	"embed"
+	"log"
 
 	"github.com/spf13/viper"
 )
 
+//go:embed config.yaml
+var file embed.FS
+
 // Config represents the overall configuration structure.
 type Config struct {
-	PostgresDB     *Database
-	HTTP           *Endpoint
+	PostgresDB *Database
+	ScyllaDB   *Database
+	OpenSearch *Database
+	Courier    *Database
+
 	UserService    *Endpoint
 	ChatService    *Endpoint
 	GatewayService *Endpoint
-	SymetricKey    string
-	FileLogOutPut  string
+
+	SymetricKey   string
+	FileLogOutPut string
 }
 
 // config is a private structure used for unmarshaling the configuration from Viper.
@@ -37,26 +45,23 @@ type config struct {
 }
 
 // LoadConfig loads the configuration from the specified file path and environment.
-func LoadConfig(path string, env string) (*Config, error) {
+func LoadConfig() *Config {
 	// Initialize an instance of the private config structure.
 	var cfg config
+	f, err := file.Open("config.yaml")
+	if err != nil {
+		log.Fatalf("unable to open config file: %v", err)
+	}
 
-	// Add the configuration path and name to Viper.
-	viper.AddConfigPath(path)
-	viper.SetConfigName(env)
-	viper.SetConfigType("env")
-
-	// Automatically read environment variables that match the structure field names.
-	viper.AutomaticEnv()
-
+	viper.SetConfigType("yaml")
 	// Read the configuration from the file.
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, fmt.Errorf("unable to read config file: %w", err)
+	if err := viper.ReadConfig(f); err != nil {
+		log.Fatalf("unable to read config file: %w", err)
 	}
 
 	// Unmarshal the configuration into the private config structure.
 	if err := viper.Unmarshal(&cfg); err != nil {
-		return nil, fmt.Errorf("unable to unmarshal config file: %w", err)
+		log.Fatalf("unable to unmarshal config file: %w", err)
 	}
 
 	// Create and return the public Config structure based on the private config.
@@ -82,5 +87,5 @@ func LoadConfig(path string, env string) (*Config, error) {
 		},
 		SymetricKey:   cfg.SymetricKey,
 		FileLogOutPut: cfg.FileLogOutPut,
-	}, nil
+	}
 }

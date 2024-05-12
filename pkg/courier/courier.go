@@ -2,6 +2,7 @@
 package courier
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strconv"
@@ -47,7 +48,7 @@ func NewClient(cfg *config.Database) *Client {
 // Connect establishes a connection to the client.
 // It starts the client and returns an error if it fails to start.
 // Returns nil if the connection is established successfully.
-func (c *Client) Connect() error {
+func (c *Client) Connect(_ context.Context) error {
 	if err := c.Client.Start(); err != nil {
 		return fmt.Errorf("unable to start courier: %w", err)
 	}
@@ -56,7 +57,7 @@ func (c *Client) Connect() error {
 }
 
 // Close stops the client and returns an error if any.
-func (c *Client) Close() error {
+func (c *Client) Close(_ context.Context) error {
 	c.Client.Stop()
 
 	return nil
