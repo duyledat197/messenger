@@ -22,7 +22,7 @@ COPY .. .
 RUN go install ./protoc/protoc-gen-event/.
 RUN go install ./protoc/protoc-gen-enum/.
 RUN go install ./protoc/protoc-gen-api-info/.
-RUN go install ./protoc/protoc-gen-client/.
+RUN go install ./protoc/protoc-gen-http-client/.
 
 FROM alpine:latest AS generate-stage
 RUN apk add curl unzip libc6-compat

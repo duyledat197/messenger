@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	extensionName = "client"
+	extensionName = "http-client"
 )
 
 func main() {
