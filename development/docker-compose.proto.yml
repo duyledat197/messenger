@@ -4,9 +4,8 @@ services:
     image: gen-go
     build:
       context: ../
-      target: protoc_gen_go
       dockerfile: ./development/proto.Dockerfile
     volumes:
       - "../:/app/"
-      - "../pb:/app/openmyth/messgener/pb"
+      - "../pb:/pb/openmyth/messgener/pb"
     entrypoint: /app/development/gen-proto.sh

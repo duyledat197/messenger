@@ -71,6 +71,13 @@ func (g *Generator) GetEnumInfos() []*protogen.Enum {
 	return g.file.Enums
 
 }
+func (g *Generator) GetServiceInfos() []*protogen.Service {
+	return g.file.Services
+}
+
+func (g *Generator) GetServiceDescInfos() []*descriptorpb.ServiceDescriptorProto {
+	return g.file.Proto.GetService()
+}
 
 func (g *Generator) GetMethodDescInfos() map[string][]*descriptorpb.MethodDescriptorProto {
 	result := make(map[string][]*descriptorpb.MethodDescriptorProto)

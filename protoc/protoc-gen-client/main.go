@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	extensionName = "http"
+	extensionName = "client"
 )
 
 func main() {
@@ -22,11 +22,13 @@ func main() {
 			if !f.Generate {
 				continue
 			}
+			isGen := false
 			gen := generator.NewGenerator(p, f, extensionName)
 
-			isGen := false
-			for svcName, methods := range gen.GetMethodDescInfos() {
-				stmt := generateConstAPIByService(svcName, methods)
+			svcInfos := gen.GetServiceInfos()
+			svcDescInfos := gen.GetServiceDescInfos()
+			for i, svc := range svcInfos {
+				stmt := generateHTTPClientByService(svc, svcDescInfos[i])
 				if stmt != nil {
 					gen.GetJen().Add(stmt)
 					isGen = true

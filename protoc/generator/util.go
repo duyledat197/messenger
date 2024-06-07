@@ -1,10 +1,13 @@
 package generator
 
 import (
+	"fmt"
+	"net/http"
 	"runtime/debug"
 	"strings"
 
 	"github.com/modern-go/reflect2"
+	options "google.golang.org/genproto/googleapis/api/annotations"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"google.golang.org/protobuf/runtime/protoimpl"
@@ -64,4 +67,43 @@ func GetVersion(infoReader BuildInfoReaderFunc) string {
 	}
 
 	return info.Main.Version
+}
+
+func GetPathFromHTTPRule(opt *options.HttpRule) (string, string) {
+	switch opt.Pattern.(type) {
+	case *options.HttpRule_Get:
+		rule := opt.Pattern.(*options.HttpRule_Get)
+		return http.MethodGet, rule.Get
+	case *options.HttpRule_Post:
+		rule := opt.Pattern.(*options.HttpRule_Post)
+		return http.MethodPost, rule.Post
+	case *options.HttpRule_Put:
+		rule := opt.Pattern.(*options.HttpRule_Put)
+		return http.MethodPut, rule.Put
+	case *options.HttpRule_Delete:
+		rule := opt.Pattern.(*options.HttpRule_Delete)
+		return http.MethodDelete, rule.Delete
+	case *options.HttpRule_Patch:
+		rule := opt.Pattern.(*options.HttpRule_Patch)
+		return http.MethodDelete, rule.Patch
+	}
+
+	return "", ""
+}
+
+// ExtractAPIOptions retrieves the HTTP options for a given method descriptor.
+func ExtractAPIOptions(meth *descriptorpb.MethodDescriptorProto) (*options.HttpRule, error) {
+	if meth.Options == nil {
+		return nil, nil
+	}
+	if !proto.HasExtension(meth.Options, options.E_Http) {
+		return nil, nil
+	}
+	ext := proto.GetExtension(meth.Options, options.E_Http)
+	opts, ok := ext.(*options.HttpRule)
+	if !ok {
+		return nil, fmt.Errorf("extension is %T; want an HttpRule", ext)
+	}
+
+	return opts, nil
 }
