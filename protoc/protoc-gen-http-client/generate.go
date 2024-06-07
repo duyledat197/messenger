@@ -69,18 +69,18 @@ const methodPattern = `
 func (c *%[2]sHTTPClient) %[1]s(ctx context.Context, reqData *%[3]s) (*%[4]s, error) {
 	path, err := url.JoinPath(c.BaseURL, "%s")
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, fmt.Errorf("path is not valid: %%v",err.Error()).Error())
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Errorf("path is not valid: %%w").Error())
 	}
 	reqClient, err := util.EncodeHTTPRequest(ctx,path,"%s",reqData)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, fmt.Errorf("unable to encode http request: %%v",err.Error()).Error())
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Errorf("unable to encode http request: %%w",err).Error())
 	}
 
 	client := http.Client{}
 
 	resp, err := client.Do(reqClient)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Errorf("unable to request: %%v",err.Error()).Error())
+		return nil, status.Errorf(codes.Internal, fmt.Errorf("unable to request: %%w",err).Error())
 	}
 
 	return util.DecodeHTTPResponse[%[4]s](resp)

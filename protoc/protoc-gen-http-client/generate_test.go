@@ -18,6 +18,7 @@ func Test_getClientStruct(t *testing.T) {
 
 	buf := bytes.Buffer{}
 	err := gf.Add(got).Render(&buf)
+
 	require.NoError(t, err)
 	require.Equal(t, expected, buf.String())
 }
