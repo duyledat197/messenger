@@ -76,9 +76,8 @@ func (c *%[2]sHTTPClient) %[1]s(ctx context.Context, reqData *%[3]s) (*%[4]s, er
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Errorf("unable to encode http request: %%w",err).Error())
 	}
 
-	client := http.Client{}
 
-	resp, err := client.Do(reqClient)
+	resp, err := http.DefaultClient.Do(reqClient)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, fmt.Errorf("unable to request: %%w",err).Error())
 	}

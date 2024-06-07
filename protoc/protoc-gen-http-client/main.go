@@ -39,6 +39,7 @@ func main() {
 					grpclog.Errorf("unable to generate %s: %v", extensionName, err)
 				}
 			}
+
 		}
 
 		return nil

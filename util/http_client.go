@@ -42,13 +42,9 @@ func injectRequestPathValue(req *http.Request, val any) {
 	v := reflect.ValueOf(val).Elem()
 	for i := 0; i < v.NumField(); i++ {
 		field := v.Type().Field(i)
-		jsonTags := strings.Split(field.Tag.Get("json"), ",")
-		if len(jsonTags) == 0 {
-			continue
-		}
 
-		jsonTag := jsonTags[0]
-		if jsonTag == "" {
+		jsonTag, _, ok := strings.Cut(field.Tag.Get("json"), ",")
+		if !ok {
 			continue
 		}
 		req.URL.Path = strings.ReplaceAll(req.URL.Path, fmt.Sprintf("{%s}", jsonTag), fmt.Sprint(v.Field(i).Interface()))
