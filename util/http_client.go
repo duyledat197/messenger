@@ -19,7 +19,6 @@ const MinErrStatusCode = 400
 
 // EncodeHTTPRequest encodes a request to an HTTP request.
 func EncodeHTTPRequest[R protoreflect.ProtoMessage](ctx context.Context, path, method string, req R) (*http.Request, error) {
-
 	jsonBytes, err := jsoniter.Marshal(req)
 	if err != nil {
 		return nil, err
@@ -58,6 +57,7 @@ func DecodeHTTPResponse[R any](resp *http.Response) (*R, error) {
 		if err := jsoniter.NewDecoder(resp.Body).Decode(&errResp); err != nil {
 			return nil, err
 		}
+
 		return nil, status.Errorf(codes.Code(resp.StatusCode), errResp.Message)
 	}
 
