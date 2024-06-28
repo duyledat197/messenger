@@ -12,6 +12,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/spf13/cast"
+
+	"openmyth/messgener/util"
 )
 
 const (
@@ -204,7 +206,7 @@ func ServeWs[T any](engine *Engine[T], w http.ResponseWriter, r *http.Request) {
 
 	channelID := cast.ToInt64(channelIDStr)
 
-	userClaims, err := engine.tokenEngine.Verify(token)
+	userClaims, err := util.VerifyToken(token)
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 	}

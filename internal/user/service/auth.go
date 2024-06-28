@@ -19,19 +19,17 @@ import (
 )
 
 type authService struct {
-	userRepo     repository.UserRepository
-	db           database.Executor
-	tknGenerator util.JWTAuthenticator
+	userRepo repository.UserRepository
+	db       database.Executor
 
 	pb.UnimplementedAuthServiceServer
 }
 
 // NewAuthService creates a new instance of the authService struct.
-func NewAuthService(db database.Executor, tknGenerator util.JWTAuthenticator, userRepo repository.UserRepository) pb.AuthServiceServer {
+func NewAuthService(db database.Executor, userRepo repository.UserRepository) pb.AuthServiceServer {
 	return &authService{
-		db:           db,
-		userRepo:     userRepo,
-		tknGenerator: tknGenerator,
+		db:       db,
+		userRepo: userRepo,
 	}
 }
 
@@ -63,7 +61,7 @@ func (s *authService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 		return nil, status.Errorf(codes.Unauthenticated, "invalid password")
 	}
 
-	tkn, err := s.tknGenerator.Generate(&jwt.StandardClaims{
+	tkn, err := util.GenerateToken(&jwt.StandardClaims{
 		Id:       user.ID.String,
 		Audience: os.Getenv("PLATFORM"), // TODO: make this configurable
 	}, cast.ToDuration(os.Getenv("TOKEN_TTL")), // TODO: make this configurable

@@ -8,7 +8,11 @@ import (
 	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+
+	mtdt "openmyth/messgener/pkg/metadata"
+	"openmyth/messgener/util"
 )
 
 type middlewareFunc func(http.Handler) http.Handler
@@ -25,6 +29,62 @@ var (
 )
 
 type payloadKeys struct{}
+
+// GetClientIP get client IP from HTTP request
+func GetClientIP(req *http.Request) string {
+	md, ok := metadata.FromIncomingContext(req.Context())
+	if !ok {
+		return ""
+	}
+	clientIP := md.Get(mtdt.MDXForwardedFor)
+	if len(clientIP) == 0 {
+		return ""
+	}
+
+	return clientIP[0]
+}
+
+// allowCORS sets up CORS headers for the HTTP handler.
+//
+// It takes an http.Handler as a parameter and returns an http.Handler.
+func allowCORS(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, authorization")
+		if r.Method != "OPTIONS" {
+			h.ServeHTTP(w, r)
+		}
+	})
+}
+
+// MapMetaDataFunc defines a function that extracts metadata from the request
+type MapMetaDataFunc func(context.Context, *http.Request) metadata.MD
+
+// MapMetaDataWithBearerToken defines a function that extracts authorization information from the request header
+// and creates metadata based on the bearer token found in the authorization header.
+func MapMetaDataWithBearerToken() MapMetaDataFunc {
+	return func(ctx context.Context, r *http.Request) metadata.MD {
+		md := metadata.MD{}
+		authorization := r.Header.Get(Authorization)
+		if authorization != "" {
+			schema, bearerToken, ok := strings.Cut(authorization, " ")
+			if !ok || strings.ToLower(schema) != strings.ToLower(Bearer) {
+				return md
+			}
+			payload, err := util.VerifyToken(bearerToken)
+			if err == nil {
+				md = metadata.Join(md, mtdt.ImportUserInfoToCtx(&mtdt.Payload{
+					UserID: payload.Id,
+					Ip:     GetClientIP(r),
+					Token:  bearerToken,
+				}))
+			}
+		}
+
+		return md
+	}
+}
 
 // func MapMetaDataWithBearerToken(authenticator authenticate.Authenticator) mapMetaDataFunc {
 // 	return func(ctx context.Context, r *http.Request) metadata.MD {
