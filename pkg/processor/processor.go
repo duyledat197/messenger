@@ -1,6 +1,8 @@
 package processor
 
-import "context"
+import (
+	"context"
+)
 
 // Processor represents the interface for a process runtime
 type Processor interface {
@@ -12,4 +14,9 @@ type Processor interface {
 type Factory interface {
 	Connect(context.Context) error
 	Close(context.Context) error
+}
+
+type Lifecycle struct {
+	factories  []Factory
+	processors []Processor
 }
