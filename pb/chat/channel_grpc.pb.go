@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	ChannelService_SearchChannelByName_FullMethodName = "/chat.ChannelService/SearchChannelByName"
+	ChannelService_GetListChannel_FullMethodName      = "/chat.ChannelService/GetListChannel"
 )
 
 // ChannelServiceClient is the client API for ChannelService service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ChannelServiceClient interface {
 	SearchChannelByName(ctx context.Context, in *SearchChannelByNameRequest, opts ...grpc.CallOption) (*SearchChannelByNameResponse, error)
+	GetListChannel(ctx context.Context, in *GetListChannelRequest, opts ...grpc.CallOption) (*GetListChannelResponse, error)
 }
 
 type channelServiceClient struct {
@@ -47,11 +49,22 @@ func (c *channelServiceClient) SearchChannelByName(ctx context.Context, in *Sear
 	return out, nil
 }
 
+func (c *channelServiceClient) GetListChannel(ctx context.Context, in *GetListChannelRequest, opts ...grpc.CallOption) (*GetListChannelResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetListChannelResponse)
+	err := c.cc.Invoke(ctx, ChannelService_GetListChannel_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ChannelServiceServer is the server API for ChannelService service.
 // All implementations must embed UnimplementedChannelServiceServer
 // for forward compatibility.
 type ChannelServiceServer interface {
 	SearchChannelByName(context.Context, *SearchChannelByNameRequest) (*SearchChannelByNameResponse, error)
+	GetListChannel(context.Context, *GetListChannelRequest) (*GetListChannelResponse, error)
 	mustEmbedUnimplementedChannelServiceServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedChannelServiceServer struct{}
 
 func (UnimplementedChannelServiceServer) SearchChannelByName(context.Context, *SearchChannelByNameRequest) (*SearchChannelByNameResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchChannelByName not implemented")
+}
+func (UnimplementedChannelServiceServer) GetListChannel(context.Context, *GetListChannelRequest) (*GetListChannelResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetListChannel not implemented")
 }
 func (UnimplementedChannelServiceServer) mustEmbedUnimplementedChannelServiceServer() {}
 func (UnimplementedChannelServiceServer) testEmbeddedByValue()                        {}
@@ -104,6 +120,24 @@ func _ChannelService_SearchChannelByName_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ChannelService_GetListChannel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetListChannelRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChannelServiceServer).GetListChannel(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ChannelService_GetListChannel_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChannelServiceServer).GetListChannel(ctx, req.(*GetListChannelRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ChannelService_ServiceDesc is the grpc.ServiceDesc for ChannelService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var ChannelService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SearchChannelByName",
 			Handler:    _ChannelService_SearchChannelByName_Handler,
+		},
+		{
+			MethodName: "GetListChannel",
+			Handler:    _ChannelService_GetListChannel_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

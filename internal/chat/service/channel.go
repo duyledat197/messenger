@@ -64,3 +64,17 @@ func channelToPb(channel *entity.Channel) *pb.Channel {
 		Description: channel.Description,
 	}
 }
+
+// GetListChannel retrieves a list of channels from the channel repository.
+// It takes a context.Context and a GetListChannelRequest as parameters.
+// It returns a GetListChannelResponse and an error.
+func (s *channelService) GetListChannel(ctx context.Context, req *pb.GetListChannelRequest) (*pb.GetListChannelResponse, error) {
+	channels, err := s.channelRepo.List(ctx, req.Offset, req.Limit)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to list channels: %v", err)
+	}
+
+	return &pb.GetListChannelResponse{
+		Channels: channelListToPbList(channels),
+	}, nil
+}

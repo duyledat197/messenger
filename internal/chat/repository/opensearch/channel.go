@@ -91,6 +91,40 @@ func (r *channelRepository) RetrieveByChannelID(ctx context.Context, id int64) (
 	return result, nil
 }
 
+func (r *channelRepository) List(ctx context.Context, offset, limit int64) ([]*entity.Channel, error) {
+	content := strings.NewReader(fmt.Sprintf(`{
+		"from": %d,
+		"size": %d
+}`, offset, limit))
+	e := &entity.Channel{}
+	search := opensearchapi.SearchRequest{
+		Index: []string{e.TableName()},
+		Body:  content,
+	}
+
+	searchResponse, err := search.Do(ctx, r.opensearchClient)
+	if err != nil {
+		return nil, err
+	}
+	if searchResponse.IsError() {
+		return nil, fmt.Errorf("retrieve error: %s", searchResponse.String())
+	}
+
+	defer searchResponse.Body.Close()
+
+	dataB, err := io.ReadAll(searchResponse.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	result := []*entity.Channel{}
+	if err := json.Unmarshal(dataB, &result); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 // SearchByName searches for channels by name in the repository.
 // It takes a context.Context and the name to search for as parameters.
 // It returns a slice of *entity.Channel and an error.

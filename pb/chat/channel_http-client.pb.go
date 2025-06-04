@@ -30,12 +30,12 @@ func NewChannelServiceHTTPClient(baseURL string) *ChannelServiceHTTPClient {
 
 // SearchChannelByName is a http call method for the ChannelService service
 func (c *ChannelServiceHTTPClient) SearchChannelByName(ctx context.Context, reqData *SearchChannelByNameRequest) (*SearchChannelByNameResponse, error) {
-	path, err := url.JoinPath(c.BaseURL, "/v1/channels")
+	path, err := url.JoinPath(c.BaseURL, "/v1/channels/search")
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Errorf("path is not valid: %w", err).Error())
 	}
 
-	reqClient, err := util.EncodeHTTPRequest(ctx, path, "POST", reqData)
+	reqClient, err := util.EncodeHTTPRequest(ctx, path, "GET", reqData)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Errorf("unable to encode http request: %w", err).Error())
 	}
@@ -46,4 +46,24 @@ func (c *ChannelServiceHTTPClient) SearchChannelByName(ctx context.Context, reqD
 	}
 
 	return util.DecodeHTTPResponse[SearchChannelByNameResponse](resp)
+}
+
+// GetListChannel is a http call method for the ChannelService service
+func (c *ChannelServiceHTTPClient) GetListChannel(ctx context.Context, reqData *GetListChannelRequest) (*GetListChannelResponse, error) {
+	path, err := url.JoinPath(c.BaseURL, "/v1/channels")
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Errorf("path is not valid: %w", err).Error())
+	}
+
+	reqClient, err := util.EncodeHTTPRequest(ctx, path, "GET", reqData)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Errorf("unable to encode http request: %w", err).Error())
+	}
+	client := http.Client{Transport: c.roundTripper}
+	resp, err := client.Do(reqClient)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, fmt.Errorf("unable to request: %w", err).Error())
+	}
+
+	return util.DecodeHTTPResponse[GetListChannelResponse](resp)
 }

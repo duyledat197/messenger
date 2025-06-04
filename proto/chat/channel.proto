@@ -9,8 +9,14 @@ service ChannelService {
   rpc SearchChannelByName(SearchChannelByNameRequest)
       returns (SearchChannelByNameResponse) {
     option (google.api.http) = {
-      post : "/v1/channels"
-      body : "*"
+      get : "/v1/channels/search"
+    };
+  };
+
+  rpc GetListChannel(GetListChannelRequest)
+      returns (GetListChannelResponse) {
+    option (google.api.http) = {
+      get : "/v1/channels"
     };
   };
 }
@@ -28,3 +34,10 @@ message SearchChannelByNameRequest {
 }
 
 message SearchChannelByNameResponse { repeated Channel channels = 1; }
+
+message GetListChannelRequest {
+  int64 offset = 1;
+  int64 limit = 2; 
+}
+
+message GetListChannelResponse { repeated Channel channels = 1; }

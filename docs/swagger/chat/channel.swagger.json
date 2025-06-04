@@ -17,7 +17,45 @@
   ],
   "paths": {
     "/v1/channels": {
-      "post": {
+      "get": {
+        "operationId": "ChannelService_GetListChannel",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chatGetListChannelResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "ChannelService"
+        ]
+      }
+    },
+    "/v1/channels/search": {
+      "get": {
         "operationId": "ChannelService_SearchChannelByName",
         "responses": {
           "200": {
@@ -35,12 +73,24 @@
         },
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chatSearchChannelByNameRequest"
-            }
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
           }
         ],
         "tags": [
@@ -65,19 +115,15 @@
         }
       }
     },
-    "chatSearchChannelByNameRequest": {
+    "chatGetListChannelResponse": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
-        },
-        "offset": {
-          "type": "string",
-          "format": "int64"
-        },
-        "limit": {
-          "type": "string",
-          "format": "int64"
+        "channels": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/chatChannel"
+          }
         }
       }
     },

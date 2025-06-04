@@ -17,7 +17,8 @@ func Test_getClientStruct(t *testing.T) {
 type HelloHTTPClient struct {
 	BaseURL      string
 	roundTripper http.RoundTripper
-}`
+} 
+`
 
 	buf := bytes.Buffer{}
 	err := gf.Add(got).Render(&buf)

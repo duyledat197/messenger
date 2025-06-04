@@ -383,3 +383,245 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SearchChannelByNameResponseValidationError{}
+
+// Validate checks the field values on GetListChannelRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetListChannelRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetListChannelRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetListChannelRequestMultiError, or nil if none found.
+func (m *GetListChannelRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetListChannelRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Offset
+
+	// no validation rules for Limit
+
+	if len(errors) > 0 {
+		return GetListChannelRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetListChannelRequestMultiError is an error wrapping multiple validation
+// errors returned by GetListChannelRequest.ValidateAll() if the designated
+// constraints aren't met.
+type GetListChannelRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetListChannelRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetListChannelRequestMultiError) AllErrors() []error { return m }
+
+// GetListChannelRequestValidationError is the validation error returned by
+// GetListChannelRequest.Validate if the designated constraints aren't met.
+type GetListChannelRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetListChannelRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetListChannelRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetListChannelRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetListChannelRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetListChannelRequestValidationError) ErrorName() string {
+	return "GetListChannelRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetListChannelRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetListChannelRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetListChannelRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetListChannelRequestValidationError{}
+
+// Validate checks the field values on GetListChannelResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetListChannelResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetListChannelResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// GetListChannelResponseMultiError, or nil if none found.
+func (m *GetListChannelResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetListChannelResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetChannels() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, GetListChannelResponseValidationError{
+						field:  fmt.Sprintf("Channels[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, GetListChannelResponseValidationError{
+						field:  fmt.Sprintf("Channels[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return GetListChannelResponseValidationError{
+					field:  fmt.Sprintf("Channels[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return GetListChannelResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetListChannelResponseMultiError is an error wrapping multiple validation
+// errors returned by GetListChannelResponse.ValidateAll() if the designated
+// constraints aren't met.
+type GetListChannelResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetListChannelResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetListChannelResponseMultiError) AllErrors() []error { return m }
+
+// GetListChannelResponseValidationError is the validation error returned by
+// GetListChannelResponse.Validate if the designated constraints aren't met.
+type GetListChannelResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetListChannelResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetListChannelResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetListChannelResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetListChannelResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetListChannelResponseValidationError) ErrorName() string {
+	return "GetListChannelResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetListChannelResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetListChannelResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetListChannelResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetListChannelResponseValidationError{}

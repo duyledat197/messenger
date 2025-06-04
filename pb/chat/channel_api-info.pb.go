@@ -5,9 +5,11 @@
 package chat
 
 const (
-	ChannelService_SearchChannelByName_API = "POST /v1/channels"
+	ChannelService_SearchChannelByName_API = "GET /v1/channels/search"
+	ChannelService_GetListChannel_API      = "GET /v1/channels"
 )
 
 var ChannelService_APIs = []string{
 	ChannelService_SearchChannelByName_API,
+	ChannelService_GetListChannel_API,
 }
