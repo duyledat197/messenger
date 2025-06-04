@@ -26,7 +26,9 @@ func NewMessageServiceHTTPClient(baseURL string) *MessageServiceHTTPClient {
 		BaseURL:      baseURL,
 		roundTripper: httpclient.NewRoundTripper(),
 	}
-} // GetMessageListChannel is a http call method for the MessageService service
+}
+
+// GetMessageListChannel is a http call method for the MessageService service
 func (c *MessageServiceHTTPClient) GetMessageListChannel(ctx context.Context, reqData *GetMessageListChannelRequest) (*GetMessageListChannelResponse, error) {
 	path, err := url.JoinPath(c.BaseURL, "/v1/channels/{channel_id}/messages")
 	if err != nil {

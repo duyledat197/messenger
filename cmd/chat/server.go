@@ -56,14 +56,15 @@ func loadConfigs() {
 // loadDatabases initializes the database clients for the server.
 func loadDatabases() {
 	cfg := server.cfg
-	// server.pgClient = postgres_client.NewPostgresClient(cfg.PostgresDB.Address())
-	server.openSearchClient = opensearch.NewOpenSearch(cfg.OpenSearch)
-	server.scylladbClient = scylla.NewScylla(cfg.ScyllaDB)
-	server.courierClient = courier.NewClient(cfg.Courier)
+	server.openSearchClient = opensearch.NewOpenSearch(cfg.Chat.OpenSearch)
+	server.scylladbClient = scylla.NewScylla(cfg.Chat.ScyllaDB)
+	server.courierClient = courier.NewClient(cfg.Chat.Courier)
 
 	server.lifecycle.WithFactories(
 		// server.pgClient,
-		server.openSearchClient, server.scylladbClient, server.courierClient)
+		server.openSearchClient,
+	//  server.scylladbClient, server.courierClient,
+	)
 }
 
 // loadRepositories initializes the message and channel repositories for the server.
@@ -85,7 +86,7 @@ func loadServices() {
 func loadServer() {
 	cfg := server.cfg
 
-	srv := grpc_server.NewGrpcServer(cfg.ChatService)
+	srv := grpc_server.NewGrpcServer(cfg.Chat.Endpoint)
 
 	pb.RegisterChannelServiceServer(srv, server.channelService)
 	pb.RegisterMessageServiceServer(srv, server.messageService)

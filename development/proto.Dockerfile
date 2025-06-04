@@ -1,4 +1,4 @@
-FROM golang:1.22.1 AS install-stage
+FROM golang:1.24.3 AS install-stage
 
 ENV GOBIN=/usr/local/bin
 
@@ -17,7 +17,7 @@ RUN mkdir -p /collect/validate && cp -r $MOD/github.com/envoyproxy/protoc-gen-va
 RUN cp -r $MOD/github.com/googleapis/googleapis@v0.0.0-20221209211743-f7f499371afa/google /collect/.
 
 WORKDIR /app
-COPY .. .
+COPY . .
 
 RUN go install ./protoc/protoc-gen-event/.
 RUN go install ./protoc/protoc-gen-enum/.

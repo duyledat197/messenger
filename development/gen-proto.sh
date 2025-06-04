@@ -1,13 +1,15 @@
 #!/bin/sh
 
 #* variables
-PROTO_PATH=/proto
+PROTO_PATH=/app/proto
 PROTO_OUT=./pb
 IDL_PATH=/pb
 DOC_OUT=/app/docs
 
+
 #* clean
 # rm -rf ${IDL_PATH}/*
+
 
 protoc \
   ${PROTO_PATH}/**/*.proto \

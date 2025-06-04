@@ -11,43 +11,37 @@ import (
 var file embed.FS
 
 // Config represents the overall configuration structure.
+
 type Config struct {
-	PostgresDB *Database
-	ScyllaDB   *Database
-	OpenSearch *Database
-	Courier    *Database
+	User struct {
+		Postgres *Database `mapstructure:"postgres"`
+		Endpoint *Endpoint `mapstructure:"endpoint"`
+	} `mapstructure:"user"`
 
-	UserService    *Endpoint
-	ChatService    *Endpoint
-	GatewayService *Endpoint
+	Chat struct {
+		OpenSearch *Database `mapstructure:"opensearch"`
+		ScyllaDB   *Database `mapstructure:"scylla"`
+		Courier    *Database `mapstructure:"courier"`
+		Endpoint   *Endpoint `mapstructure:"endpoint"`
+	} `mapstructure:"chat"`
 
-	SymetricKey   string
-	FileLogOutPut string
-}
+	Gateway struct {
+		Endpoint *Endpoint `mapstructure:"endpoint"`
+	}
 
-// config is a private structure used for unmarshaling the configuration from Viper.
-type config struct {
-	DBHost          string `mapstructure:"DB_HOST"`
-	DBPort          string `mapstructure:"DB_PORT"`
-	DBUser          string `mapstructure:"DB_USER"`
-	DBPassword      string `mapstructure:"DB_PASSWORD"`
-	DBDatabase      string `mapstructure:"DB_NAME"`
-	UserGRPCHost    string `mapstructure:"USER_GRPC_HOST"`
-	UserGRPCPort    string `mapstructure:"USER_GRPC_PORT"`
-	ChatGRPCHost    string `mapstructure:"CHAT_GRPC_HOST"`
-	ChatGRPCPort    string `mapstructure:"CHAT_GRPC_PORT"`
-	CouponGRPCHost  string `mapstructure:"COUPON_GRPC_HOST"`
-	CouponGRPCPort  string `mapstructure:"COUPON_GRPC_PORT"`
-	GatewayGRPCHost string `mapstructure:"GATEWAY_GRPC_HOST"`
-	GatewayGRPCPort string `mapstructure:"GATEWAY_GRPC_PORT"`
-	SymetricKey     string `mapstructure:"SYMETRIC_KEY"`
-	FileLogOutPut   string `mapstructure:"FILE_LOG_OUTPUT"`
+	Security struct {
+		SymetricKey string `mapstructure:"symetric_key"`
+	} `mapstructure:"security"`
+
+	Log struct {
+		FileOutput string `mapstructure:"file_output"`
+	} `mapstructure:"log"`
 }
 
 // LoadConfig loads the configuration from the specified file path and environment.
 func LoadConfig() *Config {
 	// Initialize an instance of the private config structure.
-	var cfg config
+	var cfg Config
 	f, err := file.Open("config.yaml")
 	if err != nil {
 		log.Fatalf("unable to open config file: %v", err)
@@ -64,28 +58,5 @@ func LoadConfig() *Config {
 		log.Fatalf("unable to unmarshal config file: %w", err)
 	}
 
-	// Create and return the public Config structure based on the private config.
-	return &Config{
-		PostgresDB: &Database{
-			Host:     cfg.DBHost,
-			Port:     cfg.DBPort,
-			User:     cfg.DBUser,
-			Password: cfg.DBPassword,
-			Database: cfg.DBDatabase,
-		},
-		UserService: &Endpoint{
-			Host: cfg.UserGRPCHost,
-			Port: cfg.UserGRPCPort,
-		},
-		ChatService: &Endpoint{
-			Host: cfg.ChatGRPCHost,
-			Port: cfg.ChatGRPCPort,
-		},
-		GatewayService: &Endpoint{
-			Host: cfg.GatewayGRPCHost,
-			Port: cfg.GatewayGRPCPort,
-		},
-		SymetricKey:   cfg.SymetricKey,
-		FileLogOutPut: cfg.FileLogOutPut,
-	}
+	return &cfg
 }

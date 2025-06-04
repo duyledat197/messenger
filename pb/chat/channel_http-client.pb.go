@@ -26,7 +26,9 @@ func NewChannelServiceHTTPClient(baseURL string) *ChannelServiceHTTPClient {
 		BaseURL:      baseURL,
 		roundTripper: httpclient.NewRoundTripper(),
 	}
-} // SearchChannelByName is a http call method for the ChannelService service
+}
+
+// SearchChannelByName is a http call method for the ChannelService service
 func (c *ChannelServiceHTTPClient) SearchChannelByName(ctx context.Context, reqData *SearchChannelByNameRequest) (*SearchChannelByNameResponse, error) {
 	path, err := url.JoinPath(c.BaseURL, "/v1/channels")
 	if err != nil {

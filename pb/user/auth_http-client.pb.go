@@ -26,7 +26,9 @@ func NewAuthServiceHTTPClient(baseURL string) *AuthServiceHTTPClient {
 		BaseURL:      baseURL,
 		roundTripper: httpclient.NewRoundTripper(),
 	}
-} // Login is a http call method for the AuthService service
+}
+
+// Login is a http call method for the AuthService service
 func (c *AuthServiceHTTPClient) Login(ctx context.Context, reqData *LoginRequest) (*LoginResponse, error) {
 	path, err := url.JoinPath(c.BaseURL, "/v1/auth/login")
 	if err != nil {
@@ -44,7 +46,9 @@ func (c *AuthServiceHTTPClient) Login(ctx context.Context, reqData *LoginRequest
 	}
 
 	return util.DecodeHTTPResponse[LoginResponse](resp)
-} // ForgotPassword is a http call method for the AuthService service
+}
+
+// ForgotPassword is a http call method for the AuthService service
 func (c *AuthServiceHTTPClient) ForgotPassword(ctx context.Context, reqData *ForgotPasswordRequest) (*ForgotPasswordResponse, error) {
 	path, err := url.JoinPath(c.BaseURL, "/v1/auth/forgot-password")
 	if err != nil {
@@ -62,7 +66,9 @@ func (c *AuthServiceHTTPClient) ForgotPassword(ctx context.Context, reqData *For
 	}
 
 	return util.DecodeHTTPResponse[ForgotPasswordResponse](resp)
-} // Disable2FA is a http call method for the AuthService service
+}
+
+// Disable2FA is a http call method for the AuthService service
 func (c *AuthServiceHTTPClient) Disable2FA(ctx context.Context, reqData *Disable2FARequest) (*Disable2FAResponse, error) {
 	path, err := url.JoinPath(c.BaseURL, "/v1/auth/otp/disable")
 	if err != nil {
@@ -80,7 +86,9 @@ func (c *AuthServiceHTTPClient) Disable2FA(ctx context.Context, reqData *Disable
 	}
 
 	return util.DecodeHTTPResponse[Disable2FAResponse](resp)
-} // GenerateOTP is a http call method for the AuthService service
+}
+
+// GenerateOTP is a http call method for the AuthService service
 func (c *AuthServiceHTTPClient) GenerateOTP(ctx context.Context, reqData *GenerateOTPRequest) (*GenerateOTPResponse, error) {
 	path, err := url.JoinPath(c.BaseURL, "/v1/auth/otp/generate")
 	if err != nil {
@@ -98,7 +106,9 @@ func (c *AuthServiceHTTPClient) GenerateOTP(ctx context.Context, reqData *Genera
 	}
 
 	return util.DecodeHTTPResponse[GenerateOTPResponse](resp)
-} // VerifyOTP is a http call method for the AuthService service
+}
+
+// VerifyOTP is a http call method for the AuthService service
 func (c *AuthServiceHTTPClient) VerifyOTP(ctx context.Context, reqData *VerifyOTPRequest) (*VerifyOTPResponse, error) {
 	path, err := url.JoinPath(c.BaseURL, "/v1/auth/otp/verify")
 	if err != nil {
@@ -116,7 +126,9 @@ func (c *AuthServiceHTTPClient) VerifyOTP(ctx context.Context, reqData *VerifyOT
 	}
 
 	return util.DecodeHTTPResponse[VerifyOTPResponse](resp)
-} // ResetPassword is a http call method for the AuthService service
+}
+
+// ResetPassword is a http call method for the AuthService service
 func (c *AuthServiceHTTPClient) ResetPassword(ctx context.Context, reqData *ResetPasswordRequest) (*ResetPasswordResponse, error) {
 	path, err := url.JoinPath(c.BaseURL, "/v1/auth/reset-password")
 	if err != nil {
@@ -134,7 +146,9 @@ func (c *AuthServiceHTTPClient) ResetPassword(ctx context.Context, reqData *Rese
 	}
 
 	return util.DecodeHTTPResponse[ResetPasswordResponse](resp)
-} // ChangePassword is a http call method for the AuthService service
+}
+
+// ChangePassword is a http call method for the AuthService service
 func (c *AuthServiceHTTPClient) ChangePassword(ctx context.Context, reqData *ChangePasswordRequest) (*ChangePasswordResponse, error) {
 	path, err := url.JoinPath(c.BaseURL, "/v1/auth/change-password")
 	if err != nil {
@@ -152,7 +166,9 @@ func (c *AuthServiceHTTPClient) ChangePassword(ctx context.Context, reqData *Cha
 	}
 
 	return util.DecodeHTTPResponse[ChangePasswordResponse](resp)
-} // Enable2FA is a http call method for the AuthService service
+}
+
+// Enable2FA is a http call method for the AuthService service
 func (c *AuthServiceHTTPClient) Enable2FA(ctx context.Context, reqData *Enable2FARequest) (*Enable2FAResponse, error) {
 	path, err := url.JoinPath(c.BaseURL, "/v1/auth/otp/enable")
 	if err != nil {

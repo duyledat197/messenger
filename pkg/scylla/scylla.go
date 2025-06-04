@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"time"
 
 	"github.com/gocql/gocql"
@@ -30,10 +31,10 @@ type ScyllaClient struct {
 // The function returns a pointer to a `gocqlx.Session` object.
 func NewScylla(config *config.Database) *ScyllaClient {
 
-	cfg := gocql.NewCluster(config.Address())
+	cfg := gocql.NewCluster(config.Host + ":" + config.Port)
 	cfg.ConnectTimeout = 2 * time.Second
 	cfg.Timeout = time.Second
-	cfg.NumConns = 5
+	cfg.NumConns = int(config.MaxConnection)
 	cfg.Logger = log.Default()
 
 	return &ScyllaClient{
@@ -48,6 +49,7 @@ func (db *ScyllaClient) Connect(_ context.Context) error {
 		return fmt.Errorf("unable to connect scylladb: %v", err)
 	}
 
+	slog.Info("connected to scylladb")
 	db.Session = session
 
 	return nil

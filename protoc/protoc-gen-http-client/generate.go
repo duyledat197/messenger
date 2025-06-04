@@ -58,26 +58,8 @@ func getNewClient(serviceName string) *jen.Statement {
 			jen.Id("BaseURL"):      jen.Id("baseURL"),
 			jen.Id("roundTripper"): jen.Qual("openmyth/messgener/util/http_client", "NewRoundTripper").Call(),
 		})
-	})
+	}).Line()
 }
-
-// getClientFunc generates a client function for the given service.
-func getClientFunc(serviceName string) *jen.Statement {
-	return jen.Func().Params(jen.Id("c").Op("*").Id(serviceName)).Line()
-}
-
-const importPattern = `
-	import (
-		"context"
-		"fmt"
-		"net/url"
-
-		"openmyth/messgener/util"
-
-		"google.golang.org/grpc/status"
-		"google.golang.org/grpc/codes"
-	)
-`
 
 func getMethod(methodName, serviceName, reqName, respName, path, httpMethod string) *jen.Statement {
 	return jen.Comment(methodName+" is a http call method for the "+serviceName+" service").Line().
@@ -109,31 +91,6 @@ func getMethod(methodName, serviceName, reqName, respName, path, httpMethod stri
 				Call(jen.Qual("google.golang.org/grpc/codes", "Internal"), jen.Qual("fmt", "Errorf").Call(jen.Lit("unable to request: %w"), jen.Id("err")).Dot("Error").Call())),
 		).Line()
 		g.Id("return").List(jen.Qual("openmyth/messgener/util", "DecodeHTTPResponse").Types(jen.Id(respName)).Call(jen.Id("resp")))
-	})
+	}).Line()
 
 }
-
-const methodPattern = `
-// %s is a http call method for the %s service
-func (c *%[2]sHTTPClient) %[1]s(ctx context.Context, reqData *%[3]s) (*%[4]s, error) {
-	path, err := url.JoinPath(c.BaseURL, "%s")
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, fmt.Errorf("path is not valid: %%w",err).Error())
-	}
-	reqClient, err := util.EncodeHTTPRequest(ctx,path,"%s",reqData)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, fmt.Errorf("unable to encode http request: %%w",err).Error())
-	}
-
-	client := http.Client{
-		Transport: c.roundTripper,
-	}
-
-	resp, err := client.Do(reqClient)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, fmt.Errorf("unable to request: %%w",err).Error())
-	}
-
-	return util.DecodeHTTPResponse[%[4]s](resp)
-}
-`

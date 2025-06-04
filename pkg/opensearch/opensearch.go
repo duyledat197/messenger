@@ -3,6 +3,7 @@ package opensearch
 import (
 	"context"
 	"log"
+	"log/slog"
 	"os"
 	"time"
 
@@ -26,7 +27,9 @@ type Client struct {
 // It takes a pointer to a config.Database struct as a parameter and returns a pointer to an OpenSearch struct.
 func NewOpenSearch(cfg *config.Database) *Client {
 	client, err := opensearch.NewClient(opensearch.Config{
-		Addresses:         []string{cfg.Address()},
+		Addresses:         []string{cfg.Host + ":" + cfg.Port},
+		Username:          cfg.User,
+		Password:          cfg.Password,
 		EnableMetrics:     true,
 		EnableDebugLogger: os.Getenv("ENV") == "dev",
 		Logger: &opensearchtransport.JSONLogger{
@@ -41,6 +44,7 @@ func NewOpenSearch(cfg *config.Database) *Client {
 	if err != nil {
 		log.Fatalf("unable to create opensearch client: %v", err)
 	}
+	slog.Info("connected to opensearch")
 	return &Client{
 		Client: client,
 		cfg:    cfg,

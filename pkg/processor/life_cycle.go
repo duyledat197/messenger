@@ -61,7 +61,7 @@ func (l *Lifecycle) stop(ctx context.Context, graceful ...bool) {
 			slog.Error("unable to close processor:", err)
 		}
 	}
-
+	slog.Info("graceful shutdown...")
 	if len(graceful) > 0 {
 		time.Sleep(5 * time.Second)
 	}

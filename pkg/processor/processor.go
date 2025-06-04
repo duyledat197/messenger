@@ -16,6 +16,7 @@ type Factory interface {
 	Close(context.Context) error
 }
 
+// Lifecycle represents the lifecycle of a process
 type Lifecycle struct {
 	factories  []Factory
 	processors []Processor

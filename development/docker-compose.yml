@@ -14,24 +14,14 @@ services:
     image: redis
     restart: always
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - ./redis-data:/data
 
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    restart: always
-    ports:
-      - "8081:8081"
-    environment:
-      - REDIS_HOSTS=redis-server
-    depends_on:
-      - redis
-
   scylla:
-    image: scylladb/scylla:latest
+    image: scylladb/scylla:6.0
     restart: always
-    command: --seeds=scylla-node1,scylla-node2 --smp 1 --memory 750M
+    command: --seeds=scylla-node1 --smp 1 --memory 50M
     ports:
       - 9100:9100 # Node Exporter
       - 9180:9180 # Scylla Metrics
@@ -39,6 +29,8 @@ services:
   opensearch:
     image: opensearchproject/opensearch:latest
     restart: always
+    environment:
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=D@tabase123a
     ports:
       - 9200:9200
       - 9600:9600

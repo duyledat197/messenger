@@ -37,8 +37,8 @@ func loadConfigs() {
 
 // loadServices initializes the message and channel services for the server.
 func loadClients() {
-	userConn := grpc_client.NewGrpcClient(server.cfg.UserService)
-	chatConn := grpc_client.NewGrpcClient(server.cfg.ChatService)
+	userConn := grpc_client.NewGrpcClient(server.cfg.User.Endpoint)
+	chatConn := grpc_client.NewGrpcClient(server.cfg.Chat.Endpoint)
 
 	server.authClient = userPb.NewAuthServiceClient(userConn)
 	server.messageClient = chatPb.NewMessageServiceClient(chatConn)
@@ -54,7 +54,7 @@ func loadServer() {
 
 		chatPb.RegisterChannelServiceHandlerClient(ctx, mux, server.channelClient)
 		chatPb.RegisterMessageServiceHandlerClient(ctx, mux, server.messageClient)
-	}, server.cfg.GatewayService)
+	}, server.cfg.Gateway.Endpoint)
 
 	server.lifecycle.WithProcessors(srv)
 }

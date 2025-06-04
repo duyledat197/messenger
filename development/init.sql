@@ -1,6 +1,5 @@
 -- create user management database
-CREATE DATABASE IF NOT EXISTS user_mgmt;
+CREATE DATABASE user_mgmt;
 
 -- create notification management database
-CREATE DATABASE IF NOT EXISTS notification_mgmt;
-
+CREATE DATABASE notification_mgmt;
