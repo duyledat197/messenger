@@ -14,3 +14,8 @@ type ChannelRepository interface {
 	List(ctx context.Context, offset, limit int64) ([]*entity.Channel, error)
 	Delete(context.Context, int64) error
 }
+
+type CacheChannelRepository interface {
+	CreateByList(ctx context.Context, offset, limit int64, channels []*entity.Channel) error
+	List(ctx context.Context, offset, limit int64) ([]*entity.Channel, error)
+}

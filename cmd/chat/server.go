@@ -7,6 +7,7 @@ import (
 	"openmyth/messgener/internal/chat/repository"
 	"openmyth/messgener/internal/chat/repository/cqlx"
 	open_search "openmyth/messgener/internal/chat/repository/opensearch"
+	redisRepo "openmyth/messgener/internal/chat/repository/redis"
 	"openmyth/messgener/internal/chat/service"
 	pb "openmyth/messgener/pb/chat"
 	"openmyth/messgener/pkg/courier"
@@ -14,6 +15,7 @@ import (
 	"openmyth/messgener/pkg/opensearch"
 	"openmyth/messgener/pkg/postgres_client"
 	"openmyth/messgener/pkg/processor"
+	"openmyth/messgener/pkg/redis"
 	"openmyth/messgener/pkg/scylla"
 	"openmyth/messgener/util/snowflake"
 )
@@ -24,6 +26,7 @@ var server struct {
 	openSearchClient *opensearch.Client
 	scylladbClient   *scylla.ScyllaClient
 	courierClient    *courier.Client
+	redisClient      *redis.Client
 
 	// config
 	cfg *config.Config
@@ -31,8 +34,9 @@ var server struct {
 	idGenerator snowflake.Generator
 
 	// repository
-	messageRepo repository.MessageRepository
-	channelRepo repository.ChannelRepository
+	messageRepo      repository.MessageRepository
+	channelRepo      repository.ChannelRepository
+	cacheChannelRepo repository.CacheChannelRepository
 
 	// service
 	messageService pb.MessageServiceServer
@@ -59,11 +63,14 @@ func loadDatabases() {
 	server.openSearchClient = opensearch.NewOpenSearch(cfg.Chat.OpenSearch)
 	server.scylladbClient = scylla.NewScylla(cfg.Chat.ScyllaDB)
 	server.courierClient = courier.NewClient(cfg.Chat.Courier)
+	server.redisClient = redis.NewClient(cfg.Chat.Redis)
 
 	server.lifecycle.WithFactories(
-		// server.pgClient,
+		server.pgClient,
 		server.openSearchClient,
-	//  server.scylladbClient, server.courierClient,
+		server.redisClient,
+		server.scylladbClient,
+		server.courierClient,
 	)
 }
 
@@ -71,6 +78,7 @@ func loadDatabases() {
 func loadRepositories() {
 	server.messageRepo = cqlx.NewMessageRepository(server.scylladbClient)
 	server.channelRepo = open_search.NewChannelRepository(server.openSearchClient)
+	server.cacheChannelRepo = redisRepo.NewCacheChannelRepository(server.redisClient)
 }
 
 // loadServices initializes the message and channel services for the server.
@@ -79,7 +87,7 @@ func loadServices() {
 		server.idGenerator, server.messageRepo,
 		server.channelRepo)
 
-	server.channelService = service.NewChannelService(server.channelRepo, server.idGenerator)
+	server.channelService = service.NewChannelService(server.channelRepo, server.cacheChannelRepo, server.idGenerator)
 
 }
 

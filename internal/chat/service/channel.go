@@ -13,8 +13,9 @@ import (
 )
 
 type channelService struct {
-	channelRepo repository.ChannelRepository
-	idGenerator snowflake.Generator
+	channelRepo      repository.ChannelRepository
+	cacheChannelRepo repository.CacheChannelRepository
+	idGenerator      snowflake.Generator
 
 	pb.UnimplementedChannelServiceServer
 }
@@ -24,11 +25,13 @@ type channelService struct {
 // It returns a pointer to a channelService struct that implements the pb.ChannelServiceServer interface.
 func NewChannelService(
 	channelRepo repository.ChannelRepository,
+	cacheChannelRepo repository.CacheChannelRepository,
 	idGenerator snowflake.Generator,
 ) pb.ChannelServiceServer {
 	return &channelService{
-		idGenerator: idGenerator,
-		channelRepo: channelRepo,
+		idGenerator:      idGenerator,
+		channelRepo:      channelRepo,
+		cacheChannelRepo: cacheChannelRepo,
 	}
 }
 
@@ -69,9 +72,20 @@ func channelToPb(channel *entity.Channel) *pb.Channel {
 // It takes a context.Context and a GetListChannelRequest as parameters.
 // It returns a GetListChannelResponse and an error.
 func (s *channelService) GetListChannel(ctx context.Context, req *pb.GetListChannelRequest) (*pb.GetListChannelResponse, error) {
-	channels, err := s.channelRepo.List(ctx, req.Offset, req.Limit)
+	channels, err := s.cacheChannelRepo.List(ctx, req.Offset, req.Limit)
+	if err == nil {
+		return &pb.GetListChannelResponse{
+			Channels: channelListToPbList(channels),
+		}, nil
+	}
+
+	channels, err = s.channelRepo.List(ctx, req.Offset, req.Limit)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "unable to list channels: %v", err)
+	}
+
+	if err := s.cacheChannelRepo.CreateByList(ctx, req.Offset, req.Limit, channels); err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to cache channels: %v", err)
 	}
 
 	return &pb.GetListChannelResponse{

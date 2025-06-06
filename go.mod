@@ -24,6 +24,7 @@ require (
 	github.com/pion/rtcp v1.2.14
 	github.com/pion/webrtc/v3 v3.2.29
 	github.com/reddit/jwt-go v3.2.1+incompatible
+	github.com/redis/go-redis/v9 v9.9.0
 	github.com/scylladb/gocqlx/v2 v2.8.0
 	github.com/spf13/cast v1.6.0
 	github.com/spf13/cobra v1.8.0
@@ -59,8 +60,10 @@ require (
 	github.com/blevesearch/zapx/v14 v14.3.10 // indirect
 	github.com/blevesearch/zapx/v15 v15.3.13 // indirect
 	github.com/blevesearch/zapx/v16 v16.0.12 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/eclipse/paho.mqtt.golang v1.4.3 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gojekfarm/xtools/generic v0.4.1 // indirect

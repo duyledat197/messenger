@@ -47,7 +47,7 @@ func loadConfigs() {
 // loadDatabases initializes the database clients for the server.
 func loadDatabases() {
 	cfg := server.cfg
-	server.pgClient = postgres_client.NewPostgresClient(cfg.User.Postgres.Address())
+	server.pgClient = postgres_client.NewPostgresClient(cfg.User.Postgres)
 
 	server.lifecycle.WithFactories(
 		server.pgClient,

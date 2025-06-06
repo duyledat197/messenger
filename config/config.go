@@ -22,6 +22,7 @@ type Config struct {
 		OpenSearch *Database `mapstructure:"opensearch"`
 		ScyllaDB   *Database `mapstructure:"scylla"`
 		Courier    *Database `mapstructure:"courier"`
+		Redis      *Database `mapstructure:"redis"`
 		Endpoint   *Endpoint `mapstructure:"endpoint"`
 	} `mapstructure:"chat"`
 

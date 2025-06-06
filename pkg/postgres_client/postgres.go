@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"openmyth/messgener/config"
 
 	_ "github.com/lib/pq"
 )
@@ -12,23 +13,23 @@ import (
 // PostgresClient is presentation for a custom client of postgres with [database/sql] based.
 type PostgresClient struct {
 	*sql.DB
-	addr string
+	cfg *config.Database
 }
 
 // NewPostgresClient creates a new Postgres client with the given connection string.
 //
 // connString string
 // *PostgresClient
-func NewPostgresClient(addr string) *PostgresClient {
+func NewPostgresClient(cfg *config.Database) *PostgresClient {
 	return &PostgresClient{
-		addr: addr,
+		cfg: cfg,
 	}
 }
 
 // Connect establishes a connection to the PostgreSQL database using the provided connection string.
 func (c *PostgresClient) Connect(_ context.Context) error {
 	var err error
-	c.DB, err = sql.Open("postgres", c.addr)
+	c.DB, err = sql.Open("postgres", c.cfg.Address())
 	if err != nil {
 		return err
 	}

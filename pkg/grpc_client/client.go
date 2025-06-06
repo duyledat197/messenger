@@ -2,6 +2,7 @@ package grpc_client
 
 import (
 	"context"
+	"log"
 	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
@@ -41,8 +42,8 @@ func (c *GrpcClient) Connect(ctx context.Context) error {
 		grpc_retry.WithPerRetryTimeout(3 * time.Second),
 	}
 
-	conn, err := grpc.Dial(
-		c.cfg.Address(),
+	conn, err := grpc.NewClient(
+		c.cfg.Host+":"+c.cfg.Port,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient(
 			grpc_retry.StreamClientInterceptor(optsRetry...),
@@ -56,6 +57,7 @@ func (c *GrpcClient) Connect(ctx context.Context) error {
 		return err
 	}
 
+	log.Println("connect grpc successful, address:", c.cfg.Host+":"+c.cfg.Port)
 	c.ClientConn = conn
 
 	return nil
@@ -65,5 +67,5 @@ func (c *GrpcClient) Connect(ctx context.Context) error {
 //
 // It takes a context.Context as a parameter and returns an error if there was a problem closing the connection.
 func (c *GrpcClient) Close(ctx context.Context) error {
-	return c.Close(ctx)
+	return c.ClientConn.Close()
 }
