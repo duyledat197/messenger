@@ -27,6 +27,8 @@ type Engine[T any] struct {
 	unregister chan *Client[T] // unregister a client from the hub.
 
 	Send chan SendInfo[T]
+
+	done chan struct{}
 }
 
 // NewEngine creates a new Engine and returns a pointer to it.
@@ -36,6 +38,8 @@ func NewEngine[T any]() *Engine[T] {
 		register:   make(chan *Client[T]),
 		unregister: make(chan *Client[T]),
 		clients:    make(map[string]*Client[T]),
+		Send:       make(chan SendInfo[T]),
+		done:       make(chan struct{}),
 	}
 }
 
@@ -66,21 +70,14 @@ func (h *Engine[T]) Start(_ context.Context) error {
 					delete(h.clients, client.ID)
 				}
 			}
+		case <-h.done:
+			return nil
 		}
 	}
 }
 
 // Stop description of the Go function.
 func (h *Engine[T]) Stop(_ context.Context) error {
-	close(h.register)
-	close(h.unregister)
-	close(h.broadcast)
-	close(h.Send)
-
-	for _, client := range h.clients {
-		close(client.Send)
-		delete(h.clients, client.ID)
-	}
-
+	close(h.done)
 	return nil
 }

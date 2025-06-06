@@ -1,8 +1,11 @@
 package entity
 
+import "time"
+
 type Online struct {
-	UserID   string `partkey:"user_id"`
-	ClientID string
+	UserID       string
+	ClientID     string
+	LastActiveAt time.Time
 }
 
 // TableName returns the table name for the Online struct.

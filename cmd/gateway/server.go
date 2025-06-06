@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
@@ -11,6 +12,7 @@ import (
 	"openmyth/messgener/pkg/grpc_client"
 	"openmyth/messgener/pkg/http_server"
 	"openmyth/messgener/pkg/processor"
+	"openmyth/messgener/pkg/websocket"
 )
 
 var server struct {
@@ -23,6 +25,8 @@ var server struct {
 	messageClient chatPb.MessageServiceClient
 	channelClient chatPb.ChannelServiceClient
 	authClient    userPb.AuthServiceClient
+
+	engine *websocket.Engine[chatPb.Message]
 }
 
 // loadLifecycle initializes the server's lifecycle by creating a new instance of the Lifecycle struct.
@@ -47,6 +51,12 @@ func loadClients() {
 	server.lifecycle.WithFactories(userConn, chatConn)
 }
 
+func loadEngine() {
+	server.engine = websocket.NewEngine[chatPb.Message]()
+
+	server.lifecycle.WithProcessors(server.engine)
+}
+
 func loadServer() {
 	ctx := context.Background()
 	srv := http_server.NewHttpServer(func(mux *runtime.ServeMux) {
@@ -54,6 +64,11 @@ func loadServer() {
 
 		chatPb.RegisterChannelServiceHandlerClient(ctx, mux, server.channelClient)
 		chatPb.RegisterMessageServiceHandlerClient(ctx, mux, server.messageClient)
+
+		mux.HandlePath(http.MethodPost, "/ws", func(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+			websocket.ServeWs(server.engine, w, r)
+		})
+
 	}, server.cfg.Gateway.Endpoint)
 
 	server.lifecycle.WithProcessors(srv)
@@ -64,6 +79,7 @@ func Load() {
 	loadLifecycle()
 	loadConfigs()
 	loadClients()
+	loadEngine()
 	loadServer()
 }
 

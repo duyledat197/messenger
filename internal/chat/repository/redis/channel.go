@@ -9,6 +9,11 @@ import (
 	"openmyth/messgener/pkg/redis"
 )
 
+const (
+	ChannelKeyPrefix = "channel:"
+	ChannelListTTL   = 60 * 60
+)
+
 type cacheChannelRepository struct {
 	redisClient *redis.Client
 }
@@ -20,7 +25,7 @@ func NewCacheChannelRepository(redisClient *redis.Client) repository.CacheChanne
 }
 
 func (c *cacheChannelRepository) List(ctx context.Context, offset, limit int64) ([]*entity.Channel, error) {
-	cmd := c.redisClient.Client.Get(ctx, fmt.Sprintf("channel:%d:%d", offset, limit))
+	cmd := c.redisClient.Client.Get(ctx, fmt.Sprintf("%s:%d:%d", ChannelKeyPrefix, offset, limit))
 	if err := cmd.Err(); err != nil {
 		return nil, err
 	}
@@ -37,7 +42,7 @@ func (c *cacheChannelRepository) CreateByList(ctx context.Context, offset, limit
 	if err != nil {
 		return err
 	}
-	cmd := c.redisClient.Client.Set(ctx, fmt.Sprintf("channel:%d:%d", offset, limit), data, 0)
+	cmd := c.redisClient.Client.Set(ctx, fmt.Sprintf("%s:%d:%d", ChannelKeyPrefix, offset, limit), data, ChannelListTTL)
 
 	return cmd.Err()
 }
