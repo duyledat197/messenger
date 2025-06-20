@@ -2,7 +2,7 @@ package redis
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"openmyth/messgener/config"
 
 	redis "github.com/redis/go-redis/v9"
@@ -32,10 +32,11 @@ func (c *Client) Connect(ctx context.Context) error {
 		return cmd.Err()
 	}
 
-	log.Println("connect redis successful")
+	slog.Info("connect redis successful")
 	return nil
 }
 
 func (c *Client) Close(_ context.Context) error {
+	slog.Info("close redis successful")
 	return nil
 }

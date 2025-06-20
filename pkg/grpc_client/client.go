@@ -67,5 +67,8 @@ func (c *GrpcClient) Connect(ctx context.Context) error {
 //
 // It takes a context.Context as a parameter and returns an error if there was a problem closing the connection.
 func (c *GrpcClient) Close(ctx context.Context) error {
-	return c.ClientConn.Close()
+	defer c.ClientConn.Close()
+
+	log.Println("close grpc successful, address: ", c.cfg.Host+":"+c.cfg.Port)
+	return nil
 }

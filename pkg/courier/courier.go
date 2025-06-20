@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"strconv"
 
 	"github.com/gojek/courier-go"
@@ -53,12 +54,13 @@ func (c *Client) Connect(_ context.Context) error {
 		return fmt.Errorf("unable to start courier: %w", err)
 	}
 
+	slog.Info("connect courier successful")
 	return nil
 }
 
 // Close stops the client and returns an error if any.
 func (c *Client) Close(_ context.Context) error {
-	c.Client.Stop()
-
+	defer c.Client.Stop()
+	slog.Info("close courier successful")
 	return nil
 }

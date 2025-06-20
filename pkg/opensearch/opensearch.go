@@ -4,13 +4,13 @@ import (
 	"context"
 	"log"
 	"log/slog"
-	"os"
 	"time"
 
 	opensearch "github.com/opensearch-project/opensearch-go/v2"
 	"github.com/opensearch-project/opensearch-go/v2/opensearchtransport"
 
 	"openmyth/messgener/config"
+	"openmyth/messgener/pkg/common"
 )
 
 // Client represents the Client client.
@@ -31,7 +31,7 @@ func NewOpenSearch(cfg *config.Database) *Client {
 		Username:          cfg.User,
 		Password:          cfg.Password,
 		EnableMetrics:     true,
-		EnableDebugLogger: os.Getenv("ENV") == "dev",
+		EnableDebugLogger: config.GetGlobalConfig().Env == common.EnvironmentDev,
 		Logger: &opensearchtransport.JSONLogger{
 			Output:             log.Writer(),
 			EnableRequestBody:  true,
@@ -44,7 +44,7 @@ func NewOpenSearch(cfg *config.Database) *Client {
 	if err != nil {
 		log.Fatalf("unable to create opensearch client: %v", err)
 	}
-	slog.Info("connected to opensearch")
+
 	return &Client{
 		Client: client,
 		cfg:    cfg,
@@ -55,6 +55,7 @@ func NewOpenSearch(cfg *config.Database) *Client {
 // It takes a context.Context for cancellation.
 // It returns an error if the connection fails.
 func (o *Client) Connect(_ context.Context) error {
+	slog.Info("connected to opensearch")
 	return nil
 }
 

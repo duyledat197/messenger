@@ -58,6 +58,6 @@ func (db *ScyllaClient) Connect(_ context.Context) error {
 // Close stops the ScyllaClient.
 func (db *ScyllaClient) Close(_ context.Context) error {
 	defer db.Session.Close()
-
+	slog.Info("close scylladb successful")
 	return nil
 }

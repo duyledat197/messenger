@@ -68,7 +68,6 @@ func loadServices() {
 }
 
 func loadServer() {
-
 	srv := grpc_server.NewGrpcServer(config.GetGlobalConfig().User.Endpoint)
 
 	pb.RegisterAuthServiceServer(srv, server.authService)

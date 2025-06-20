@@ -4,7 +4,7 @@ package postgres_client
 import (
 	"context"
 	"database/sql"
-	"log"
+	"log/slog"
 	"openmyth/messgener/config"
 
 	_ "github.com/lib/pq"
@@ -38,7 +38,7 @@ func (c *PostgresClient) Connect(_ context.Context) error {
 		return err
 	}
 
-	log.Println("connect postgres successful")
+	slog.Info("connect postgres successful")
 
 	return nil
 }
@@ -47,5 +47,6 @@ func (c *PostgresClient) Connect(_ context.Context) error {
 func (c *PostgresClient) Close(_ context.Context) error {
 	defer c.DB.Close()
 
+	slog.Info("close postgres successful")
 	return nil
 }
