@@ -26,6 +26,7 @@ type Config struct {
 		ScyllaDB   *Database `mapstructure:"scylla"`
 		Courier    *Database `mapstructure:"courier"`
 		Redis      *Database `mapstructure:"redis"`
+		Postgres   *Database `mapstructure:"postgres"`
 		Endpoint   *Endpoint `mapstructure:"endpoint"`
 	} `mapstructure:"chat"`
 

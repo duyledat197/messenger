@@ -28,6 +28,22 @@ chat:
     database: chat_keyspace
     max_connection: 8
 
+  redis:
+    host: localhost
+    port: "6379"
+    user: redis_user
+    password: redis_pass
+    database: chat_db
+    max_connection: 8
+
+  postgres:
+    host: localhost
+    port: "5432"
+    user: postgres_user
+    password: postgres_pass
+    database: chat_db
+    max_connection: 8
+
   courier:
     host: localhost
     port: "3306"

@@ -67,6 +67,7 @@ func loadDatabases() {
 	server.scylladbClient = scylla.NewScylla(config.GetGlobalConfig().Chat.ScyllaDB)
 	server.courierClient = courier.NewClient(config.GetGlobalConfig().Chat.Courier)
 	server.redisClient = redis.NewClient(config.GetGlobalConfig().Chat.Redis)
+	server.pgClient = postgres_client.NewPostgresClient(config.GetGlobalConfig().Chat.Postgres)
 
 	server.lifecycle.WithFactories(
 		server.pgClient,
