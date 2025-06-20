@@ -18,10 +18,7 @@ var server struct {
 	// database
 	pgClient *postgres_client.PostgresClient
 
-	// config
-	cfg *config.Config
-
-	idGenerator snowflake.Generator
+	idGenerator *snowflake.Generator
 
 	// repository
 	userRepo repository.UserRepository
@@ -39,15 +36,16 @@ func loadLifecycle() {
 
 // loadConfigs loads the configuration for the server.
 func loadConfigs() {
-	server.cfg = config.LoadConfig()
+	if err := config.LoadConfig(); err != nil {
+		panic(err)
+	}
 
-	server.idGenerator = *snowflake.NewGenerator(1)
+	server.idGenerator = snowflake.NewGenerator(1)
 }
 
 // loadDatabases initializes the database clients for the server.
 func loadDatabases() {
-	cfg := server.cfg
-	server.pgClient = postgres_client.NewPostgresClient(cfg.User.Postgres)
+	server.pgClient = postgres_client.NewPostgresClient(config.GetGlobalConfig().User.Postgres)
 
 	server.lifecycle.WithFactories(
 		server.pgClient,
@@ -65,9 +63,8 @@ func loadServices() {
 }
 
 func loadServer() {
-	cfg := server.cfg
 
-	srv := grpc_server.NewGrpcServer(cfg.User.Endpoint)
+	srv := grpc_server.NewGrpcServer(config.GetGlobalConfig().User.Endpoint)
 
 	pb.RegisterAuthServiceServer(srv, server.authService)
 

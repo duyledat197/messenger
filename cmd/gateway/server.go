@@ -16,10 +16,6 @@ import (
 )
 
 var server struct {
-
-	// config
-	cfg *config.Config
-
 	lifecycle *processor.Lifecycle
 
 	messageClient chatPb.MessageServiceClient
@@ -36,13 +32,15 @@ func loadLifecycle() {
 
 // loadConfigs loads the configuration for the server.
 func loadConfigs() {
-	server.cfg = config.LoadConfig()
+	if err := config.LoadConfig(); err != nil {
+		panic(err)
+	}
 }
 
 // loadServices initializes the message and channel services for the server.
 func loadClients() {
-	userConn := grpc_client.NewGrpcClient(server.cfg.User.Endpoint)
-	chatConn := grpc_client.NewGrpcClient(server.cfg.Chat.Endpoint)
+	userConn := grpc_client.NewGrpcClient(config.GetGlobalConfig().User.Endpoint)
+	chatConn := grpc_client.NewGrpcClient(config.GetGlobalConfig().Chat.Endpoint)
 
 	server.authClient = userPb.NewAuthServiceClient(userConn)
 	server.messageClient = chatPb.NewMessageServiceClient(chatConn)
@@ -69,7 +67,7 @@ func loadServer() {
 			websocket.ServeWs(server.engine, w, r)
 		})
 
-	}, server.cfg.Gateway.Endpoint)
+	}, config.GetGlobalConfig().Gateway.Endpoint)
 
 	server.lifecycle.WithProcessors(srv)
 }

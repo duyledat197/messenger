@@ -28,9 +28,6 @@ var server struct {
 	courierClient    *courier.Client
 	redisClient      *redis.Client
 
-	// config
-	cfg *config.Config
-
 	idGenerator snowflake.Generator
 
 	// repository
@@ -52,18 +49,19 @@ func loadLifecycle() {
 
 // loadConfigs loads the configuration for the server.
 func loadConfigs() {
-	server.cfg = config.LoadConfig()
+	if err := config.LoadConfig(); err != nil {
+		panic(err)
+	}
 
 	server.idGenerator = *snowflake.NewGenerator(1)
 }
 
 // loadDatabases initializes the database clients for the server.
 func loadDatabases() {
-	cfg := server.cfg
-	server.openSearchClient = opensearch.NewOpenSearch(cfg.Chat.OpenSearch)
-	server.scylladbClient = scylla.NewScylla(cfg.Chat.ScyllaDB)
-	server.courierClient = courier.NewClient(cfg.Chat.Courier)
-	server.redisClient = redis.NewClient(cfg.Chat.Redis)
+	server.openSearchClient = opensearch.NewOpenSearch(config.GetGlobalConfig().Chat.OpenSearch)
+	server.scylladbClient = scylla.NewScylla(config.GetGlobalConfig().Chat.ScyllaDB)
+	server.courierClient = courier.NewClient(config.GetGlobalConfig().Chat.Courier)
+	server.redisClient = redis.NewClient(config.GetGlobalConfig().Chat.Redis)
 
 	server.lifecycle.WithFactories(
 		server.pgClient,
@@ -92,9 +90,8 @@ func loadServices() {
 }
 
 func loadServer() {
-	cfg := server.cfg
 
-	srv := grpc_server.NewGrpcServer(cfg.Chat.Endpoint)
+	srv := grpc_server.NewGrpcServer(config.GetGlobalConfig().Chat.Endpoint)
 
 	pb.RegisterChannelServiceServer(srv, server.channelService)
 	pb.RegisterMessageServiceServer(srv, server.messageService)

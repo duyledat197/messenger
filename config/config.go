@@ -3,15 +3,18 @@ package config
 import (
 	"embed"
 	"log"
+	"sync/atomic"
 
 	"github.com/spf13/viper"
 )
 
-//go:embed config.yaml
-var file embed.FS
+var (
+	//go:embed config.yaml
+	file       embed.FS
+	globalConf atomic.Pointer[Config]
+)
 
 // Config represents the overall configuration structure.
-
 type Config struct {
 	User struct {
 		Postgres *Database `mapstructure:"postgres"`
@@ -40,7 +43,7 @@ type Config struct {
 }
 
 // LoadConfig loads the configuration from the specified file path and environment.
-func LoadConfig() *Config {
+func LoadConfig() error {
 	// Initialize an instance of the private config structure.
 	var cfg Config
 	f, err := file.Open("config.yaml")
@@ -59,5 +62,11 @@ func LoadConfig() *Config {
 		log.Fatalf("unable to unmarshal config file: %w", err)
 	}
 
-	return &cfg
+	globalConf.Store(&cfg)
+
+	return nil
+}
+
+func GetGlobalConfig() *Config {
+	return globalConf.Load()
 }

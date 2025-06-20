@@ -35,7 +35,6 @@ func (r *onlineRepository) RetrieveByUserID(ctx context.Context, userID string) 
 	}
 
 	return &online, nil
-
 }
 
 // Create creates a new online repository by user ID.

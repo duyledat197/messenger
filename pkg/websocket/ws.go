@@ -79,12 +79,12 @@ func (c *Client[T]) readPump() {
 	}()
 	c.conn.SetReadLimit(maxMessageSize)
 	if err := c.conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
-		slog.Error("unable to read deadline: %v", err)
+		slog.Error("unable to read deadline: %v", slog.String("err", err.Error()))
 		return
 	}
 	c.conn.SetPongHandler(func(string) error {
 		if err := c.conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
-			slog.Error("unable to set read deadline: %v", err)
+			slog.Error("unable to set read deadline: %v", slog.String("err", err.Error()))
 
 			return err
 		}
