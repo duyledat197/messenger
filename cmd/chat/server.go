@@ -12,6 +12,7 @@ import (
 	pb "openmyth/messgener/pb/chat"
 	"openmyth/messgener/pkg/courier"
 	"openmyth/messgener/pkg/grpc_server"
+	"openmyth/messgener/pkg/logger"
 	"openmyth/messgener/pkg/opensearch"
 	"openmyth/messgener/pkg/postgres_client"
 	"openmyth/messgener/pkg/processor"
@@ -40,6 +41,10 @@ var server struct {
 	channelService pb.ChannelServiceServer
 
 	lifecycle *processor.Lifecycle
+}
+
+func loadLogger() {
+	logger.SetLoggerGlobal()
 }
 
 // loadLifecycle initializes the server's lifecycle by creating a new instance of the Lifecycle struct.
@@ -86,7 +91,6 @@ func loadServices() {
 		server.channelRepo)
 
 	server.channelService = service.NewChannelService(server.channelRepo, server.cacheChannelRepo, server.idGenerator)
-
 }
 
 func loadServer() {
@@ -103,6 +107,7 @@ func loadServer() {
 func Load() {
 	loadLifecycle()
 	loadConfigs()
+	loadLogger()
 	loadDatabases()
 	loadRepositories()
 	loadServices()

@@ -40,6 +40,8 @@ type Config struct {
 	Log struct {
 		FileOutput string `mapstructure:"file_output"`
 	} `mapstructure:"log"`
+
+	Env string `mapstructure:"env"`
 }
 
 // LoadConfig loads the configuration from the specified file path and environment.

@@ -18,6 +18,7 @@ require (
 	github.com/iancoleman/strcase v0.3.0
 	github.com/json-iterator/go v1.1.12
 	github.com/lib/pq v1.10.9
+	github.com/lmittmann/tint v1.1.2
 	github.com/modern-go/reflect2 v1.0.2
 	github.com/nicksnyder/go-i18n/v2 v2.4.0
 	github.com/opensearch-project/opensearch-go/v2 v2.3.0

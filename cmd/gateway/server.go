@@ -11,6 +11,7 @@ import (
 	userPb "openmyth/messgener/pb/user"
 	"openmyth/messgener/pkg/grpc_client"
 	"openmyth/messgener/pkg/http_server"
+	"openmyth/messgener/pkg/logger"
 	"openmyth/messgener/pkg/processor"
 	"openmyth/messgener/pkg/websocket"
 )
@@ -28,6 +29,10 @@ var server struct {
 // loadLifecycle initializes the server's lifecycle by creating a new instance of the Lifecycle struct.
 func loadLifecycle() {
 	server.lifecycle = processor.NewLifecycle()
+}
+
+func loadLogger() {
+	logger.SetLoggerGlobal()
 }
 
 // loadConfigs loads the configuration for the server.
@@ -76,6 +81,7 @@ func loadServer() {
 func Load() {
 	loadLifecycle()
 	loadConfigs()
+	loadLogger()
 	loadClients()
 	loadEngine()
 	loadServer()
