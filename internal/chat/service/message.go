@@ -15,18 +15,16 @@ import (
 type messageService struct {
 	messageRepo repository.MessageRepository
 	channelRepo repository.ChannelRepository
-	idGenerator snowflake.Generator
 
 	pb.UnimplementedMessageServiceServer
 }
 
 // NewMessageService returns a new instance of the pb.MessageServiceServer interface.
 // It takes no parameters and returns a pointer to a messageService struct that implements the pb.MessageServiceServer interface.
-func NewMessageService(idGenerator snowflake.Generator, messageRepo repository.MessageRepository, channelRepo repository.ChannelRepository) pb.MessageServiceServer {
+func NewMessageService(messageRepo repository.MessageRepository, channelRepo repository.ChannelRepository) pb.MessageServiceServer {
 	return &messageService{
 		messageRepo: messageRepo,
 		channelRepo: channelRepo,
-		idGenerator: idGenerator,
 	}
 }
 
@@ -34,7 +32,7 @@ func NewMessageService(idGenerator snowflake.Generator, messageRepo repository.M
 // It takes a context.Context and a *pb.SendMessageRequest as parameters.
 // It returns a *pb.SendMessageResponse and an error.
 func (s *messageService) SendMessage(ctx context.Context, req *pb.SendMessageRequest) (*pb.SendMessageResponse, error) {
-	messageID := s.idGenerator.Generate().Int64()
+	messageID := snowflake.GenerateID()
 	if err := s.messageRepo.Create(ctx, &entity.Message{
 		ChannelID: req.ChannelId,
 		Content:   req.Content,

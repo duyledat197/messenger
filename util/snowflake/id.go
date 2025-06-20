@@ -2,22 +2,21 @@ package snowflake
 
 import (
 	"log"
+	"sync/atomic"
 
 	"github.com/bwmarrin/snowflake"
 )
 
-// Generator holds a snowflake node for generating IDs.
-type Generator struct {
-	*snowflake.Node // The snowflake node to use for generating IDs.
-}
+var globalIDGenerator atomic.Pointer[snowflake.Node]
 
-// NewGenerator creates a new Generator instance with the specified nodeID.
-func NewGenerator(nodeID int64) *Generator {
-	node, err := snowflake.NewNode(nodeID)
+func SetGlobalIDGenerator(nodeNum int64) {
+	node, err := snowflake.NewNode(nodeNum)
 	if err != nil {
 		log.Fatalf("unable to generate snowflake: %v", err)
 	}
-	return &Generator{
-		Node: node,
-	}
+	globalIDGenerator.Store(node)
+}
+
+func GenerateID() int64 {
+	return globalIDGenerator.Load().Generate().Int64()
 }

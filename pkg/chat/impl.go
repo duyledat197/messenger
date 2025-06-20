@@ -16,8 +16,6 @@ import (
 type Impl struct {
 	onlineRepo  repository.OnlineRepository
 	messageRepo repository.MessageRepository
-
-	idGenerator *snowflake.Generator
 }
 
 // NewImpl creates a new instance of the Impl struct, which implements the websocket.Impl interface for the Message type.
@@ -26,12 +24,10 @@ type Impl struct {
 func NewImpl(
 	onlineRepo repository.OnlineRepository,
 	messageRepo repository.MessageRepository,
-	idGenerator *snowflake.Generator,
 ) websocket.Impl[Message] {
 	return &Impl{
 		onlineRepo:  onlineRepo,
 		messageRepo: messageRepo,
-		idGenerator: idGenerator,
 	}
 }
 
@@ -48,7 +44,7 @@ func (i *Impl) Execute(client *websocket.Client[Message], data Message) error {
 		return err
 	}
 
-	id := i.idGenerator.Generate().Int64()
+	id := snowflake.GenerateID()
 
 	if err := i.messageRepo.Create(ctx, &entity.Message{
 		Bucket:    snowflake.MakeBucket(id),

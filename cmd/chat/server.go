@@ -29,8 +29,6 @@ var server struct {
 	courierClient    *courier.Client
 	redisClient      *redis.Client
 
-	idGenerator snowflake.Generator
-
 	// repository
 	messageRepo      repository.MessageRepository
 	channelRepo      repository.ChannelRepository
@@ -57,8 +55,11 @@ func loadConfigs() {
 	if err := config.LoadConfig(); err != nil {
 		panic(err)
 	}
+}
 
-	server.idGenerator = *snowflake.NewGenerator(1)
+func loadIDGenerator() {
+	num, _ := server.redisClient.Client.Incr(context.Background(), "node_num").Result()
+	snowflake.SetGlobalIDGenerator(num)
 }
 
 // loadDatabases initializes the database clients for the server.
@@ -88,10 +89,10 @@ func loadRepositories() {
 // loadServices initializes the message and channel services for the server.
 func loadServices() {
 	server.messageService = service.NewMessageService(
-		server.idGenerator, server.messageRepo,
+		server.messageRepo,
 		server.channelRepo)
 
-	server.channelService = service.NewChannelService(server.channelRepo, server.cacheChannelRepo, server.idGenerator)
+	server.channelService = service.NewChannelService(server.channelRepo, server.cacheChannelRepo)
 }
 
 func loadServer() {
@@ -110,6 +111,7 @@ func Load() {
 	loadConfigs()
 	loadLogger()
 	loadDatabases()
+	loadIDGenerator()
 	loadRepositories()
 	loadServices()
 	loadServer()

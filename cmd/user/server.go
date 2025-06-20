@@ -12,14 +12,14 @@ import (
 	"openmyth/messgener/pkg/logger"
 	"openmyth/messgener/pkg/postgres_client"
 	"openmyth/messgener/pkg/processor"
+	"openmyth/messgener/pkg/redis"
 	"openmyth/messgener/util/snowflake"
 )
 
 var server struct {
 	// database
-	pgClient *postgres_client.PostgresClient
-
-	idGenerator *snowflake.Generator
+	pgClient    *postgres_client.PostgresClient
+	redisClient *redis.Client
 
 	// repository
 	userRepo repository.UserRepository
@@ -45,15 +45,21 @@ func loadConfigs() {
 		panic(err)
 	}
 
-	server.idGenerator = snowflake.NewGenerator(1)
+}
+
+func loadIDGenerator() {
+	num, _ := server.redisClient.Client.Incr(context.Background(), "node_num").Result()
+	snowflake.SetGlobalIDGenerator(num)
 }
 
 // loadDatabases initializes the database clients for the server.
 func loadDatabases() {
 	server.pgClient = postgres_client.NewPostgresClient(config.GetGlobalConfig().User.Postgres)
+	server.redisClient = redis.NewClient(config.GetGlobalConfig().Chat.Redis)
 
 	server.lifecycle.WithFactories(
 		server.pgClient,
+		server.redisClient,
 	)
 }
 
@@ -81,6 +87,7 @@ func Load() {
 	loadConfigs()
 	loadLogger()
 	loadDatabases()
+	loadIDGenerator()
 	loadRepositories()
 	loadServices()
 	loadServer()

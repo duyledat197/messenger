@@ -9,13 +9,11 @@ import (
 	"openmyth/messgener/internal/chat/entity"
 	"openmyth/messgener/internal/chat/repository"
 	pb "openmyth/messgener/pb/chat"
-	"openmyth/messgener/util/snowflake"
 )
 
 type channelService struct {
 	channelRepo      repository.ChannelRepository
 	cacheChannelRepo repository.CacheChannelRepository
-	idGenerator      snowflake.Generator
 
 	pb.UnimplementedChannelServiceServer
 }
@@ -26,10 +24,8 @@ type channelService struct {
 func NewChannelService(
 	channelRepo repository.ChannelRepository,
 	cacheChannelRepo repository.CacheChannelRepository,
-	idGenerator snowflake.Generator,
 ) pb.ChannelServiceServer {
 	return &channelService{
-		idGenerator:      idGenerator,
 		channelRepo:      channelRepo,
 		cacheChannelRepo: cacheChannelRepo,
 	}
