@@ -65,8 +65,8 @@ func (s *authService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 
 	tkn, err := util.GenerateToken(&jwt.StandardClaims{
 		Id:       user.ID.String,
-		Audience: config.GetGlobalConfig().Platform, // TODO: make this configurable
-	}, config.GetGlobalConfig().TokenTTL, // TODO: make this configurable
+		Audience: config.GetGlobalConfig().Platform,
+	}, config.GetGlobalConfig().TokenTTL,
 	)
 
 	if err != nil {

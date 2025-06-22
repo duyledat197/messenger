@@ -97,6 +97,8 @@ func (u *userRepository) RetrieveByPhone(ctx context.Context, db database.Execut
 
 	return e, nil
 }
+
+// RetrieveByID retrieves a user from the userRepository based on the provided ID.
 func (u *userRepository) RetrieveByID(ctx context.Context, db database.Executor, id string) (*entity.User, error) {
 	e := &entity.User{}
 	fields, values := database.FieldMap(e)
