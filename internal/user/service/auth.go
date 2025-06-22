@@ -4,16 +4,18 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"os"
 
+	"github.com/pquerna/otp"
+	"github.com/pquerna/otp/totp"
 	"github.com/reddit/jwt-go"
-	"github.com/spf13/cast"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"openmyth/messgener/config"
 	"openmyth/messgener/internal/user/entity"
 	"openmyth/messgener/internal/user/repository"
 	pb "openmyth/messgener/pb/user"
+	"openmyth/messgener/pkg/metadata"
 	"openmyth/messgener/util"
 	"openmyth/messgener/util/database"
 )
@@ -63,8 +65,8 @@ func (s *authService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 
 	tkn, err := util.GenerateToken(&jwt.StandardClaims{
 		Id:       user.ID.String,
-		Audience: os.Getenv("PLATFORM"), // TODO: make this configurable
-	}, cast.ToDuration(os.Getenv("TOKEN_TTL")), // TODO: make this configurable
+		Audience: config.GetGlobalConfig().Platform, // TODO: make this configurable
+	}, config.GetGlobalConfig().TokenTTL, // TODO: make this configurable
 	)
 
 	if err != nil {
@@ -77,20 +79,96 @@ func (s *authService) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Logi
 	}, nil
 }
 
-func (s *authService) ForgotPassword(_ context.Context, _ *pb.ForgotPasswordRequest) (*pb.ForgotPasswordResponse, error) {
-	panic("not implemented") // TODO: Implement
+func (s *authService) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequest) (*pb.ForgotPasswordResponse, error) {
+	user, err := s.userRepo.RetrieveByPhone(ctx, s.db, req.GetPhone())
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, status.Errorf(codes.NotFound, "user not found")
+		}
+		return nil, status.Errorf(codes.Internal, "unable to retrieve user: %v", err)
+	}
+
+	tkn, err := util.GenerateToken(&jwt.StandardClaims{
+		Id:       user.ID.String,
+		Audience: config.GetGlobalConfig().Platform,
+	}, config.GetGlobalConfig().TokenTTL,
+	)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to generate token: %v", err)
+	}
+
+	return &pb.ForgotPasswordResponse{
+		Token: tkn,
+	}, nil
 }
 
-func (s *authService) Disable2FA(_ context.Context, _ *pb.Disable2FARequest) (*pb.Disable2FAResponse, error) {
-	panic("not implemented") // TODO: Implement
+func (s *authService) Disable2FA(ctx context.Context, _ *pb.Disable2FARequest) (*pb.Disable2FAResponse, error) {
+	userCtx, ok := metadata.ExtractUserInfoFromCtx(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "user is invalid")
+	}
+
+	user, err := s.userRepo.RetrieveByID(ctx, s.db, userCtx.UserID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to retrieve user: %v", err)
+	}
+
+	user.Enable2FA.Scan(false)
+
+	if err := s.userRepo.UpdateInfoByID(ctx, s.db, userCtx.UserID, user); err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to update user: %v", err)
+	}
+
+	return &pb.Disable2FAResponse{}, nil
 }
 
-func (s *authService) GenerateOTP(_ context.Context, _ *pb.GenerateOTPRequest) (*pb.GenerateOTPResponse, error) {
-	panic("not implemented") // TODO: Implement
+func (s *authService) GenerateOTP(ctx context.Context, req *pb.GenerateOTPRequest) (*pb.GenerateOTPResponse, error) {
+	userCtx, ok := metadata.ExtractUserInfoFromCtx(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "user is invalid")
+	}
+
+	user, err := s.userRepo.RetrieveByID(ctx, s.db, userCtx.UserID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to retrieve user: %v", err)
+	}
+
+	key, err := totp.Generate(totp.GenerateOpts{
+		Issuer:      "openmyth",
+		AccountName: user.Email.String,
+		Secret:      []byte(user.OTPSecret.String),
+		SecretSize:  16,
+		Period:      30,
+		Digits:      otp.DigitsSix,
+		Algorithm:   otp.AlgorithmSHA1,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "failed to generate OTP: %v", err)
+	}
+
+	return &pb.GenerateOTPResponse{
+		OtpAuthUrl: key.URL(),
+		Base32:     key.Secret(),
+	}, nil
 }
 
-func (s *authService) VerifyOTP(_ context.Context, _ *pb.VerifyOTPRequest) (*pb.VerifyOTPResponse, error) {
-	panic("not implemented") // TODO: Implement
+func (s *authService) VerifyOTP(ctx context.Context, req *pb.VerifyOTPRequest) (*pb.VerifyOTPResponse, error) {
+	userCtx, ok := metadata.ExtractUserInfoFromCtx(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "user is invalid")
+	}
+
+	user, err := s.userRepo.RetrieveByID(ctx, s.db, userCtx.UserID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to retrieve user: %v", err)
+	}
+
+	valid := totp.Validate(req.GetOtp(), user.OTPSecret.String)
+	if !valid {
+		return nil, status.Errorf(codes.Unauthenticated, "invalid OTP")
+	}
+
+	return &pb.VerifyOTPResponse{}, nil
 }
 
 func (s *authService) ResetPassword(_ context.Context, _ *pb.ResetPasswordRequest) (*pb.ResetPasswordResponse, error) {
@@ -101,6 +179,22 @@ func (s *authService) ChangePassword(_ context.Context, _ *pb.ChangePasswordRequ
 	panic("not implemented") // TODO: Implement
 }
 
-func (s *authService) Enable2FA(_ context.Context, _ *pb.Enable2FARequest) (*pb.Enable2FAResponse, error) {
-	panic("not implemented") // TODO: Implement
+func (s *authService) Enable2FA(ctx context.Context, _ *pb.Enable2FARequest) (*pb.Enable2FAResponse, error) {
+	userCtx, ok := metadata.ExtractUserInfoFromCtx(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "user is invalid")
+	}
+
+	user, err := s.userRepo.RetrieveByID(ctx, s.db, userCtx.UserID)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to retrieve user: %v", err)
+	}
+
+	user.Enable2FA.Scan(true)
+
+	if err := s.userRepo.UpdateInfoByID(ctx, s.db, userCtx.UserID, user); err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to update user: %v", err)
+	}
+
+	return &pb.Enable2FAResponse{}, nil
 }

@@ -61,6 +61,7 @@ require (
 	github.com/blevesearch/zapx/v14 v14.3.10 // indirect
 	github.com/blevesearch/zapx/v15 v15.3.13 // indirect
 	github.com/blevesearch/zapx/v16 v16.0.12 // indirect
+	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
@@ -96,6 +97,7 @@ require (
 	github.com/pion/transport/v2 v2.2.3 // indirect
 	github.com/pion/turn/v2 v2.1.3 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+	github.com/pquerna/otp v1.5.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/scylladb/go-reflectx v1.0.1 // indirect

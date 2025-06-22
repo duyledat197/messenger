@@ -4,6 +4,7 @@ import (
 	"embed"
 	"log"
 	"sync/atomic"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -35,14 +36,17 @@ type Config struct {
 	}
 
 	Security struct {
-		SymetricKey string `mapstructure:"symetric_key"`
+		SymetricKey  string `mapstructure:"symetric_key"`
+		JwtSecretKey string `mapstructure:"jwt_secret_key"`
 	} `mapstructure:"security"`
 
 	Log struct {
 		FileOutput string `mapstructure:"file_output"`
 	} `mapstructure:"log"`
 
-	Env string `mapstructure:"env"`
+	Env      string        `mapstructure:"env"`
+	Platform string        `mapstructure:"platform"`
+	TokenTTL time.Duration `mapstructure:"token_ttl"`
 }
 
 // LoadConfig loads the configuration from the specified file path and environment.

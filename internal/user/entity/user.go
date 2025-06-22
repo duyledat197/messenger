@@ -14,6 +14,8 @@ type User struct {
 	Facebook       sql.NullString `json:"facebook,omitempty"`        // Facebook of the user.
 	Discord        sql.NullString `json:"discord,omitempty"`         // Discord of the user.
 	Github         sql.NullString `json:"github,omitempty"`          // Github of the user.
+	Phone          sql.NullString `json:"phone,omitempty"`           // Phone number of the user.
+	OTPSecret      sql.NullString `json:"otp_secret,omitempty"`      // OTP secret of the user.
 }
 
 // TableName returns the table name for the User struct.

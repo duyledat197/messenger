@@ -82,3 +82,31 @@ func (u *userRepository) RetrieveByUserName(ctx context.Context, db database.Exe
 
 	return e, nil
 }
+
+// RetrieveByPhone retrieves a user from the userRepository based on the provided phone number.
+func (u *userRepository) RetrieveByPhone(ctx context.Context, db database.Executor, phone string) (*entity.User, error) {
+	e := &entity.User{}
+	fields, values := database.FieldMap(e)
+	stmt := fmt.Sprintf(`SELECT %s FROM %s WHERE phone = $1`,
+		strings.Join(fields, ","),
+		e.TableName(),
+	)
+	if err := db.QueryRowContext(ctx, stmt, &phone).Scan(values...); err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}
+func (u *userRepository) RetrieveByID(ctx context.Context, db database.Executor, id string) (*entity.User, error) {
+	e := &entity.User{}
+	fields, values := database.FieldMap(e)
+	stmt := fmt.Sprintf(`SELECT %s FROM %s WHERE id = $1`,
+		strings.Join(fields, ","),
+		e.TableName(),
+	)
+	if err := db.QueryRowContext(ctx, stmt, &id).Scan(values...); err != nil {
+		return nil, err
+	}
+
+	return e, nil
+}

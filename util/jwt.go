@@ -3,17 +3,18 @@ package util
 import (
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/reddit/jwt-go"
+
+	"openmyth/messgener/config"
 )
 
 var secretKey = ""
 
 func getSecret() string {
 	if secretKey != "" {
-		secretKey = os.Getenv("JWT_SECRET_KEY")
+		secretKey = config.GetGlobalConfig().Security.JwtSecretKey
 	}
 
 	return secretKey
