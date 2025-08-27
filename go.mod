@@ -1,6 +1,6 @@
 module openmyth/messgener
 
-go 1.22.1
+go 1.25.0
 
 require (
 	github.com/BurntSushi/toml v1.3.2
@@ -24,6 +24,7 @@ require (
 	github.com/opensearch-project/opensearch-go/v2 v2.3.0
 	github.com/pion/rtcp v1.2.14
 	github.com/pion/webrtc/v3 v3.2.29
+	github.com/pquerna/otp v1.5.0
 	github.com/reddit/jwt-go v3.2.1+incompatible
 	github.com/redis/go-redis/v9 v9.9.0
 	github.com/scylladb/gocqlx/v2 v2.8.0
@@ -97,7 +98,6 @@ require (
 	github.com/pion/transport/v2 v2.2.3 // indirect
 	github.com/pion/turn/v2 v2.1.3 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/pquerna/otp v1.5.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/scylladb/go-reflectx v1.0.1 // indirect

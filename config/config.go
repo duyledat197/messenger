@@ -61,12 +61,12 @@ func LoadConfig() error {
 	viper.SetConfigType("yaml")
 	// Read the configuration from the file.
 	if err := viper.ReadConfig(f); err != nil {
-		log.Fatalf("unable to read config file: %w", err)
+		log.Fatalf("unable to read config file: %v", err)
 	}
 
 	// Unmarshal the configuration into the private config structure.
 	if err := viper.Unmarshal(&cfg); err != nil {
-		log.Fatalf("unable to unmarshal config file: %w", err)
+		log.Fatalf("unable to unmarshal config file: %v", err)
 	}
 
 	globalConf.Store(&cfg)

@@ -58,7 +58,7 @@ func (l *Lifecycle) Start(ctx context.Context) {
 func (l *Lifecycle) stop(ctx context.Context, graceful ...bool) {
 	for _, p := range l.processors {
 		if err := p.Stop(ctx); err != nil {
-			slog.Error("unable to close processor:", err)
+			slog.Error("unable to close processor:", slog.String("err", err.Error()))
 		}
 	}
 	slog.Info("graceful shutdown...")
@@ -68,7 +68,7 @@ func (l *Lifecycle) stop(ctx context.Context, graceful ...bool) {
 
 	for _, f := range l.factories {
 		if err := f.Close(ctx); err != nil {
-			slog.Error("unable to close factory:", err)
+			slog.Error("unable to close factory:", slog.String("err", err.Error()))
 		}
 	}
 }

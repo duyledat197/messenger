@@ -1,6 +1,8 @@
 package config
 
-import "fmt"
+import (
+	"net"
+)
 
 // Endpoint represents the configuration for a network endpoint.
 type Endpoint struct {
@@ -10,5 +12,5 @@ type Endpoint struct {
 
 // Address returns the formatted address string combining the Host and Port.
 func (e *Endpoint) Address() string {
-	return fmt.Sprintf("%s:%s", e.Host, e.Port)
+	return net.JoinHostPort(e.Host, e.Port)
 }

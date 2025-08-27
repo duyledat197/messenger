@@ -9,6 +9,7 @@ import (
 	"openmyth/messgener/internal/chat/entity"
 	"openmyth/messgener/internal/chat/repository"
 	pb "openmyth/messgener/pb/chat"
+	"openmyth/messgener/util/slices"
 )
 
 type channelService struct {
@@ -41,18 +42,8 @@ func (s *channelService) SearchChannelByName(ctx context.Context, req *pb.Search
 	}
 
 	return &pb.SearchChannelByNameResponse{
-		Channels: channelListToPbList(channels),
+		Channels: slices.Transform(channels, channelToPb),
 	}, nil
-}
-
-// channelListToPbList converts a list of entity.Channel pointers to a list of pb.Channel pointers.
-func channelListToPbList(channels []*entity.Channel) []*pb.Channel {
-	var result []*pb.Channel
-	for _, c := range channels {
-		result = append(result, channelToPb(c))
-	}
-
-	return result
 }
 
 // channelToPb converts an entity.Channel to a pb.Channel.
@@ -71,7 +62,7 @@ func (s *channelService) GetListChannel(ctx context.Context, req *pb.GetListChan
 	channels, err := s.cacheChannelRepo.List(ctx, req.Offset, req.Limit)
 	if err == nil {
 		return &pb.GetListChannelResponse{
-			Channels: channelListToPbList(channels),
+			Channels: slices.Transform(channels, channelToPb),
 		}, nil
 	}
 
@@ -85,6 +76,6 @@ func (s *channelService) GetListChannel(ctx context.Context, req *pb.GetListChan
 	}
 
 	return &pb.GetListChannelResponse{
-		Channels: channelListToPbList(channels),
+		Channels: slices.Transform(channels, channelToPb),
 	}, nil
 }

@@ -9,6 +9,7 @@ import (
 	"openmyth/messgener/internal/chat/entity"
 	"openmyth/messgener/internal/chat/repository"
 	pb "openmyth/messgener/pb/chat"
+	"openmyth/messgener/util/slices"
 	"openmyth/messgener/util/snowflake"
 )
 
@@ -62,18 +63,8 @@ func (s *messageService) GetMessageListChannel(ctx context.Context, req *pb.GetM
 	}
 
 	return &pb.GetMessageListChannelResponse{
-		Messages: messageListToPbList(result),
+		Messages: slices.Transform(result, messageToPb),
 	}, nil
-}
-
-// messageListToPbList converts a list of entity.Message objects to a list of pb.Message objects.
-func messageListToPbList(result []*entity.Message) []*pb.Message {
-	var resp []*pb.Message
-	for _, v := range result {
-		resp = append(resp, messageToPb(v))
-	}
-
-	return resp
 }
 
 // messageToPb converts an entity.Message to a pb.Message.
