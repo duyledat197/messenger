@@ -1,5 +1,6 @@
 user:
   postgres:
+    schema: postgres
     host: localhost
     port: "5432"
     user: user
@@ -21,6 +22,7 @@ chat:
     max_connection: 5
 
   scylla:
+    schema: scylla
     host: localhost
     port: "9100"
     user: scylla_user
@@ -29,6 +31,7 @@ chat:
     max_connection: 8
 
   redis:
+    schema: redis
     host: localhost
     port: "6379"
     user: redis_user
@@ -37,6 +40,7 @@ chat:
     max_connection: 8
 
   postgres:
+    schema: postgres
     host: localhost
     port: "5432"
     user: postgres_user

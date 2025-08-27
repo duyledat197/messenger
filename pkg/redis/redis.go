@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"log/slog"
+	"net"
 	"openmyth/messgener/config"
 
 	redis "github.com/redis/go-redis/v9"
@@ -15,11 +16,11 @@ type Client struct {
 
 func NewClient(cfg *config.Database) *Client {
 	client := redis.NewClient(&redis.Options{
-		Addr:       cfg.Host + ":" + cfg.Port,
-		Username:   cfg.User,
-		Password:   cfg.Password, // no password set
-		DB:         0,            // use default DB
-		MaxRetries: int(cfg.MaxConnection),
+		Addr:           net.JoinHostPort(cfg.Host, cfg.Port),
+		Username:       cfg.User,
+		Password:       cfg.Password, // no password set
+		DB:             0,            // use default DB
+		MaxActiveConns: int(cfg.MaxConnection),
 	})
 	return &Client{
 		Client: client,

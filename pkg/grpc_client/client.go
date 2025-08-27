@@ -43,7 +43,7 @@ func (c *GrpcClient) Connect(ctx context.Context) error {
 	}
 
 	conn, err := grpc.NewClient(
-		c.cfg.Host+":"+c.cfg.Port,
+		c.cfg.Address(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithStreamInterceptor(grpc_middleware.ChainStreamClient(
 			grpc_retry.StreamClientInterceptor(optsRetry...),

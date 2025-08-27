@@ -6,6 +6,7 @@ import (
 	"openmyth/messgener/config"
 	"openmyth/messgener/pkg/common"
 	"os"
+	"time"
 
 	"github.com/lmittmann/tint"
 )
@@ -27,7 +28,8 @@ func SetLoggerGlobal() {
 		})
 	default:
 		slogHandler = tint.NewHandler(os.Stdout, &tint.Options{
-			AddSource: true,
+			AddSource:  true,
+			TimeFormat: time.RFC3339Nano,
 		})
 	}
 

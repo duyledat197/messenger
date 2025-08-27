@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"log/slog"
+	"net"
 	"time"
 
 	opensearch "github.com/opensearch-project/opensearch-go/v2"
@@ -27,7 +28,7 @@ type Client struct {
 // It takes a pointer to a config.Database struct as a parameter and returns a pointer to an OpenSearch struct.
 func NewOpenSearch(cfg *config.Database) *Client {
 	client, err := opensearch.NewClient(opensearch.Config{
-		Addresses:         []string{cfg.Host + ":" + cfg.Port},
+		Addresses:         []string{net.JoinHostPort(cfg.Host, cfg.Port)},
 		Username:          cfg.User,
 		Password:          cfg.Password,
 		EnableMetrics:     true,
