@@ -31,7 +31,7 @@ func (l *Lifecycle) Start(ctx context.Context) {
 
 	for _, f := range l.factories {
 		if err := f.Connect(ctx); err != nil {
-			errChan <- err
+			slog.Error("unable to connect factory:", slog.String("err", err.Error())) //nolint:lll //err)
 		}
 	}
 

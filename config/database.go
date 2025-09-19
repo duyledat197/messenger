@@ -16,7 +16,7 @@ type Database struct {
 // Address returns the formatted string for the database connection address.
 func (e *Database) Address() string {
 	return fmt.Sprintf(
-		"%s://%s:%s@%s:%s/%s",
+		"%s://%s:%s@%s:%s/%s?sslmode=disable",
 		e.Schema,
 		e.User,
 		e.Password,

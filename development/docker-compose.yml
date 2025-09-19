@@ -15,14 +15,16 @@ services:
     restart: always
     ports:
       - "6380:6379"
+    command: [ "redis-server", "--requirepass", "redis_pass" ]
     volumes:
       - ./redis-data:/data
 
   scylla:
     image: scylladb/scylla:6.0
-    restart: always
-    command: --seeds=scylla-node1 --smp 1 --memory 50M
+    # restart: always
+    command: --smp 1 --memory 750M --overprovisioned 1
     ports:
+      - 9042:9042
       - 9100:9100 # Node Exporter
       - 9180:9180 # Scylla Metrics
 

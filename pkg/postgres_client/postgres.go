@@ -4,10 +4,12 @@ package postgres_client
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log/slog"
-	"openmyth/messgener/config"
 
 	_ "github.com/lib/pq"
+
+	"openmyth/messgener/config"
 )
 
 // PostgresClient is presentation for a custom client of postgres with [database/sql] based.
@@ -31,11 +33,11 @@ func (c *PostgresClient) Connect(_ context.Context) error {
 	var err error
 	c.DB, err = sql.Open("postgres", c.cfg.Address())
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to connect postgres: %w", err)
 	}
 
 	if err := c.DB.Ping(); err != nil {
-		return err
+		return fmt.Errorf("unable to connect postgres: %w", err)
 	}
 
 	slog.Info("connect postgres successful")
@@ -45,8 +47,10 @@ func (c *PostgresClient) Connect(_ context.Context) error {
 
 // Close closes the Postgres client.
 func (c *PostgresClient) Close(_ context.Context) error {
-	defer c.DB.Close()
+	if c.DB != nil {
+		slog.Info("close postgres successful")
+		return c.DB.Close()
+	}
 
-	slog.Info("close postgres successful")
 	return nil
 }

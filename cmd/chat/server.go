@@ -66,7 +66,7 @@ func loadIDGenerator() {
 func loadDatabases() {
 	server.openSearchClient = opensearch.NewOpenSearch(config.GetGlobalConfig().Chat.OpenSearch)
 	server.scylladbClient = scylla.NewScylla(config.GetGlobalConfig().Chat.ScyllaDB)
-	server.courierClient = courier.NewClient(config.GetGlobalConfig().Chat.Courier)
+	// server.courierClient = courier.NewClient(config.GetGlobalConfig().Chat.Courier)
 	server.redisClient = redis.NewClient(config.GetGlobalConfig().Chat.Redis)
 	server.pgClient = postgres_client.NewPostgresClient(config.GetGlobalConfig().Chat.Postgres)
 
@@ -75,7 +75,7 @@ func loadDatabases() {
 		server.openSearchClient,
 		server.redisClient,
 		server.scylladbClient,
-		server.courierClient,
+		// server.courierClient,
 	)
 }
 

@@ -5,7 +5,7 @@ user:
     port: "5432"
     user: user
     password: password
-    database: postgres
+    database: messenger
     max_connection: 10
 
   endpoint:
@@ -24,7 +24,7 @@ chat:
   scylla:
     schema: scylla
     host: localhost
-    port: "9100"
+    port: "9042"
     user: scylla_user
     password: scylla_pass
     database: chat_keyspace
@@ -33,7 +33,7 @@ chat:
   redis:
     schema: redis
     host: localhost
-    port: "6379"
+    port: "6380"
     user: redis_user
     password: redis_pass
     database: chat_db
@@ -43,9 +43,9 @@ chat:
     schema: postgres
     host: localhost
     port: "5432"
-    user: postgres_user
-    password: postgres_pass
-    database: chat_db
+    user: user
+    password: password
+    database: messenger
     max_connection: 8
 
   courier:

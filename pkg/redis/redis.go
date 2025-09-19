@@ -2,11 +2,13 @@ package redis
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"net"
-	"openmyth/messgener/config"
 
 	redis "github.com/redis/go-redis/v9"
+
+	"openmyth/messgener/config"
 )
 
 type Client struct {
@@ -17,7 +19,6 @@ type Client struct {
 func NewClient(cfg *config.Database) *Client {
 	client := redis.NewClient(&redis.Options{
 		Addr:           net.JoinHostPort(cfg.Host, cfg.Port),
-		Username:       cfg.User,
 		Password:       cfg.Password, // no password set
 		DB:             0,            // use default DB
 		MaxActiveConns: int(cfg.MaxConnection),
@@ -30,7 +31,7 @@ func NewClient(cfg *config.Database) *Client {
 
 func (c *Client) Connect(ctx context.Context) error {
 	if cmd := c.Client.Ping(ctx); cmd.Err() != nil {
-		return cmd.Err()
+		return fmt.Errorf("unable to connect redis: %w", cmd.Err())
 	}
 
 	slog.Info("connect redis successful")
