@@ -69,7 +69,7 @@ func MapMetaDataWithBearerToken() MapMetaDataFunc {
 		authorization := r.Header.Get(Authorization)
 		if authorization != "" {
 			schema, bearerToken, ok := strings.Cut(authorization, " ")
-			if !ok || strings.ToLower(schema) != strings.ToLower(Bearer) {
+			if !ok || strings.EqualFold(schema, Bearer) {
 				return md
 			}
 			payload, err := util.VerifyToken(bearerToken)

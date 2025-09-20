@@ -29,12 +29,12 @@ func NewHttpServer(
 			MarshalOptions:   protojson.MarshalOptions{UseEnumNumbers: false, EmitUnpopulated: true},
 			UnmarshalOptions: protojson.UnmarshalOptions{AllowPartial: true},
 		}),
-		// runtime.WithMetadata(MapMetaDataWithBearerToken()),
-		// runtime.WithErrorHandler(forwardErrorResponse),
+		runtime.WithMetadata(MapMetaDataWithBearerToken()),
+		runtime.WithErrorHandler(forwardErrorResponse),
 	)
 	handler(mux)
 	middlewares := []middlewareFunc{
-		// allowCORS,
+		allowCORS,
 	}
 
 	slices.Reverse(middlewares)
